@@ -1,0 +1,25 @@
+div.inputPanel {
+    display: flex;
+}
+
+div.inputDescription {
+    margin: 5px;
+    margin-right: 25px;
+    vertical-align: middle;
+}
+
+div.inputField {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+div.inputField label {
+    margin-bottom: 5px;
+    font-size: small;
+}
+
+div.error_message {
+    margin-left: 150px;
+    color: #FF9999;
+}

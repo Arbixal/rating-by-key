@@ -1,0 +1,16 @@
+div.affixBox {
+    display: flex;
+    line-height: 32px;
+    vertical-align: middle;
+    padding: 5px;
+}
+
+ul {
+    display: flex;
+    margin: 0;
+}
+
+li {
+    list-style-type: none;
+    margin-right: 5px;
+}

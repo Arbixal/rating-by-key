@@ -1,38 +1,65 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+body {
+  background-color: #282c34;
+  color: white;
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 5px;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.death_knight {
+  color: #C41E3A;
+}
+
+.demon_hunter {
+  color: #A330C9;
+}
+
+.druid {
+  color: #FF7C0A;
+}
+
+.evoker {
+  color: #33937F;
+}
+
+.hunter {
+  color: #AAD372;
+}
+
+.mage {
+  color: #3FC7EB;
+}
+
+.monk {
+  color: #00FF98;
+}
+
+.paladin {
+  color: #F48CBA;
+}
+
+.priest {
+  color: #FFFFFF;
+}
+
+.rogue {
+  color: #FFF468;
+}
+
+.shaman {
+  color: #0070DD;
+}
+
+.warlock {
+  color: #8788EE;
+}
+
+.warrior {
+  color: #C69B6D;
 }

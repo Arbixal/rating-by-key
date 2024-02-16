@@ -1,0 +1,24 @@
+div.characterPanel {
+    display: flex;
+    margin-left: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.verticalFlex {
+    display: flex;
+    flex-direction: column;
+}
+
+div.characterThumbnail {
+    margin-right: 10px;
+}
+
+div.characterName {
+    font-size: x-large;
+}
+
+div.characterRating {
+    font-size: large;
+    padding-bottom: 5px;
+}

@@ -1,0 +1,70 @@
+table {
+    background-color: #222222;
+    border: solid 1px #444444;
+    margin-left: 5px;
+}
+
+td {
+    text-align: right;
+}
+
+.key_rating {
+    min-width: 30px;
+}
+
+tr.odd {
+    background-color: #222222;
+}
+
+tr.even {
+    background-color: #333333;
+}
+
+td.fortified, th.fortified {
+    background-color: #0a2d3d;
+}
+
+tr.even td.fortified {
+    background-color: #0f4761;
+}
+
+td.tyrannical, th.tyrannical {
+    background-color: #2c1d07;
+}
+
+tr.even td.tyrannical {
+    background-color: #4e340c;
+}
+
+.evenCol {
+    background-color: #444444;
+    width: 40px;
+}
+
+.oddCol {
+    width: 40px;
+}
+
+tr.even > td.evenCol {
+    background-color: #555555;
+}
+
+.rating {
+    width: 50px;
+}
+
+.timeFail {
+    color: #AC1F39;
+}
+
+.timePlus3 {
+    color: #4ec04e;
+}
+
+.timePlus2 {
+    color: #FFC84A;
+}
+
+.timeTarget {
+    color: #FFFFFF;
+}
