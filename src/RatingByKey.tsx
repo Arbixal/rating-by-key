@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
-import { formatTime } from "./utils";
 import RatingByKeyRow from "./RatingByKeyRow";
 
 // https://raider.io/api/v1/mythic-plus/static-data?expansion_id=9
@@ -236,7 +235,7 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
             }
         });
 
-        setLowestKey(lowestKeyWithRating == 99 ? 2 : lowestKeyWithRating);
+        setLowestKey(lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating);
         setHighestKey(Math.min(MAX_KEY, Math.max(20, highestKeyCompleted + 10)))
 
         return data;

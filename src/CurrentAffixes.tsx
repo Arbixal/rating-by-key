@@ -71,7 +71,7 @@ function CurrentAffixes({onDataChange}: CurrentAffixesProps)
                 setError(error);
                 onDataChange(null);
             })
-    }, [])
+    }, [onDataChange])
 
     if (error) {
         return <div>Error: {error.message}</div>

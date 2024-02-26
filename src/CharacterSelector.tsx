@@ -320,10 +320,12 @@
 }
 */
 
-import { KeyboardEvent, MouseEvent, useState } from "react";
+import { KeyboardEvent, MouseEvent, useCallback, useMemo, useState } from "react";
 import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
 import { Affix } from "./CurrentAffixes";
+import RecentCharacters, { CharacterInput } from "./RecentCharacters";
+import { useNavigate } from "react-router-dom";
 
 interface RaiderIOCharacter extends RaiderIOError {
     name: string,
@@ -387,15 +389,20 @@ export interface RaiderIORun {
 
 interface CharacterSelectorProps {
     onDataChange: (data: RaiderIORun[] | null) => void;
+    region: string;
+    realm: string;
+    character: string;
 }
 
-function CharacterSelector({onDataChange}: CharacterSelectorProps)
+function CharacterSelector({onDataChange, region, realm, character}: CharacterSelectorProps)
 {
-    const [character, setCharacter] = useState<string | undefined>(undefined);
-    const [region, setRegion] = useState<string>("us");
-    const [realm, setRealm] = useState<string | undefined>(undefined);
+    const navigate = useNavigate();
+    const [characterState, setCharacter] = useState<string>(character);
+    const [regionState, setRegion] = useState<string>(region ?? "us");
+    const [realmState, setRealm] = useState<string>(realm);
     const [error, setError] = useState<Error | null>(null)
     const [characterDetails, setCharacterDetails] = useState<CharacterDetails | null>(null)
+    const [loadedCharacter, setLoadedCharacter] = useState<CharacterInput | null>(null);
 
     const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
         if (e.code !== "Enter" ) {
@@ -405,7 +412,7 @@ function CharacterSelector({onDataChange}: CharacterSelectorProps)
         setCharacterDetails(null);
         onDataChange(null);
 
-        fetchCharacterData();
+        navigate(`/${regionState}/${realmState}/${characterState}`);
     }
     
     const handleFetch = (e: MouseEvent<HTMLButtonElement>): void => {
@@ -414,17 +421,18 @@ function CharacterSelector({onDataChange}: CharacterSelectorProps)
         setCharacterDetails(null);
         onDataChange(null);
         
-        fetchCharacterData();
+        navigate(`/${regionState}/${realmState}/${characterState}`);
     }
 
-    const fetchCharacterData = () => {
-        if (!character || !region || !realm) {
+    const fetchCharacterData = useCallback((regionLocal: string, realmLocal: string | undefined, characterLocal: string | undefined) => {
+        console.log(`Loading ${regionLocal}/${realmLocal}/${characterLocal}`)
+        if (!characterLocal || !regionLocal || !realmLocal) {
             return;
         }
 
-        fetch("https://raider.io/api/v1/characters/profile?region=" + region.toLowerCase() 
-            + "&realm=" + realm.toLowerCase() 
-            + "&name=" + character.toLowerCase() 
+        fetch("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase() 
+            + "&realm=" + realmLocal.toLowerCase() 
+            + "&name=" + characterLocal.toLowerCase() 
             + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_alternate_runs")
             .then(resp =>  resp.json())
             .then((result: RaiderIOCharacter) => {
@@ -451,6 +459,7 @@ function CharacterSelector({onDataChange}: CharacterSelectorProps)
                 });
                 setError(null);
                 onDataChange([...result.mythic_plus_best_runs,...result.mythic_plus_alternate_runs]);
+                setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
             },
             (error) => {
                 setError(error);
@@ -458,37 +467,50 @@ function CharacterSelector({onDataChange}: CharacterSelectorProps)
                 onDataChange(null);
             })
             .catch(err => setError(err))
-    }
+    }, [onDataChange]);
+
+    useMemo(() => {
+      if (region !== '' && realm !== '' && character !== '') {
+        console.log(`Region: ${region}, Realm: ${realm}, Character: ${character}`);
+        setCharacter(character);
+        setRegion(region);
+        setRealm(realm);
+        fetchCharacterData(region, realm, character);
+      }
+    }, [region, realm, character, fetchCharacterData]);
 
     return (
-        <>
-        <div className="inputPanel">
-            <div className="inputDescription">Character Select: </div>
-            <div className="inputField">
-                <label>Region</label>
-                <select name="region" onChange={(e) => setRegion(e.target.value)}>
-                    <option value="us">US</option>
-                    <option value="eu">EU</option>
-                    <option value="kr">KR</option>
-                    <option value="tw">TW</option>
-                </select>
+        <div className="topArea">
+          <div>
+            <div className="inputPanel">
+                <div className="inputDescription">Character Select: </div>
+                <div className="inputField">
+                    <label>Region</label>
+                    <select name="region" onChange={(e) => setRegion(e.target.value)} value={regionState}>
+                        <option value="us">US</option>
+                        <option value="eu">EU</option>
+                        <option value="kr">KR</option>
+                        <option value="tw">TW</option>
+                    </select>
+                </div>
+                <div className="inputField">
+                    <label>Realm</label>
+                    <input type="text" onChange={(e) => setRealm(e.target.value)} value={realmState} />
+                </div>
+                <div className="inputField">
+                    <label>Character</label>
+                    <input type="text" onChange={(e) => setCharacter(e.target.value)} onKeyDown={handleKeyPress} value={characterState} />
+                </div>
+                <div className="inputField">
+                    <label>&nbsp;</label>
+                    <button onClick={handleFetch}>Fetch Character</button>
+                </div>
             </div>
-            <div className="inputField">
-                <label>Realm</label>
-                <input type="text" onChange={(e) => setRealm(e.target.value)} />
-            </div>
-            <div className="inputField">
-                <label>Character</label>
-                <input type="text" onChange={(e) => setCharacter(e.target.value)} onKeyDown={handleKeyPress} />
-            </div>
-            <div className="inputField">
-                <label>&nbsp;</label>
-                <button onClick={handleFetch}>Fetch Character</button>
-            </div>
+            {characterDetails !== null && <CharacterBadge {...characterDetails} />}
+            {error !== null && <div className="error_message">{error.message}</div>}
+          </div>
+          <RecentCharacters selectedCharacter={loadedCharacter} />
         </div>
-        {characterDetails !== null && <CharacterBadge {...characterDetails} />}
-        {error !== null && <div className="error_message">{error.message}</div>}
-        </>
     )
 }
 

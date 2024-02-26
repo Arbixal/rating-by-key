@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { RaiderIODungeon, RatingRange, TableData, getScoreLevels } from "./RatingByKey";
-import { formatTime, roundToOneDecimal } from "./utils";
-import { faAnglesDown, faAnglesUp, faStar } from "@fortawesome/free-solid-svg-icons";
+import { formatTime } from "./utils";
+import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
-import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, Label, XAxis, CartesianGrid } from "recharts";
+import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, XAxis } from "recharts";
 
 const SEASON_3_TIMERS: {[index: number]: number} = {
     9028: 1800999, // Atal'Dazar
@@ -127,7 +127,7 @@ function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, inde
         <td className="timePlus3">{formatTime(plus3)}</td>
         <td className="timeFail">{formatTime(fail)}</td>
 
-        <td className="fortified level">{playerData.fortified?.level} <FontAwesomeIcon size="2xs" icon={faStar} /></td>
+        <td className="fortified level">{playerData.fortified?.level}</td>
         <td className="fortified timer">{playerData.fortified?.timer ? formatTime(new Date(playerData.fortified.timer)) : null}</td>
         <td className="fortified score">{playerData.fortified?.score.toFixed(1)}</td>
         <td className="fortified rating">{playerData.fortified?.rating.toFixed(1)}</td>
