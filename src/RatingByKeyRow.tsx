@@ -14,6 +14,15 @@ const SEASON_3_TIMERS: {[index: number]: number} = {
     7109: 1980999, // The Everbloom
     4738: 2040999, // The Throne of the Tides
     9424: 2220999, // Warcrest Manor
+
+    14032: 1920999, // Algethar Academy
+    13991: 2100999, // Brackenhide Hollow
+    14082: 2100999, // Halls of Infusion
+    14011: 1980999, // Neltharus
+    14063: 1800999, // Ruby Life Pools
+    13954: 2250999, // The Azure Vault
+    13982: 2400999, // The Nokhud Offensive
+    13968: 2040999, // Uldaman Legacy of Tyr
 };
 
 interface RatingByKeyRowProps {

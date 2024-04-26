@@ -139,9 +139,10 @@ export class TableData {
 }
 
 const DRAGONFLIGHT_EXPANSION = 9;
-const MAX_KEY = 35;
+const MAX_KEY = 15;
 
 function getScore(par: number, timer: number, level: number) {
+    level = level + 10;
     const bonus = Math.max(-1, Math.min(1, (par - timer) / (par * 0.4)));
     const adjustedLevel = level + bonus + (bonus < 0 ? -1 : 0);
     const levelsAbove10 = Math.max(0, level - 10);
