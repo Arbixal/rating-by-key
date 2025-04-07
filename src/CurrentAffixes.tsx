@@ -48,11 +48,7 @@ interface AffixesResult {
     affix_details: Affix[];
 }
 
-interface CurrentAffixesProps {
-    onDataChange: (data: string | null) => void;
-}
-
-function CurrentAffixes({onDataChange}: CurrentAffixesProps)
+function CurrentAffixes()
 {
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -64,14 +60,12 @@ function CurrentAffixes({onDataChange}: CurrentAffixesProps)
             .then((result: AffixesResult) => {
                 setIsLoaded(true);
                 setAffixes(result.affix_details);
-                onDataChange(result.affix_details[0].name);
             },
             (error) => {
                 setIsLoaded(true);
                 setError(error);
-                onDataChange(null);
             })
-    }, [onDataChange])
+    }, [])
 
     if (error) {
         return <div>Error: {error.message}</div>

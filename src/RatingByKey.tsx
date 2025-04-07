@@ -96,6 +96,8 @@ interface RaiderIOStaticData {
 interface RaiderIOSeason {
     slug: string,
     name: string,
+    blizzard_season_id: number,
+    is_main_season: boolean,
     short_name: string,
     seasonal_affix: string | null,
     starts: { us: Date, eu: Date, tw: Date, kr: Date, cn: Date },
@@ -109,10 +111,12 @@ export interface RaiderIODungeon {
     slug: string,
     name: string,
     short_name: string,
+    keystone_timer_seconds: number,
+    icon_url: string,
+    background_image_url: string
 }
 
 interface RatingByKeyProps {
-    affix: string | null,
     runData: RaiderIORun[] | null,
 }
 
@@ -120,7 +124,6 @@ interface AffixSummary {
     level: number | null,
     timer: number | null,
     score: number,
-    rating: number,
 };
 
 export interface RatingRange {
@@ -132,23 +135,42 @@ export interface RatingRange {
 }
 
 export class TableData {
-    fortified: AffixSummary = { level: null, timer: null, score: 0, rating: 0};
-    tyrannical: AffixSummary = { level: null, timer: null, score: 0, rating: 0};
+    bestRun: AffixSummary = { level: null, timer: null, score: 0};
     levels: {[index: number] : RatingRange} = {};
-    total_rating: number = 0;
 }
 
-const DRAGONFLIGHT_EXPANSION = 9;
+const CURRENT_EXPANSION = 10;
 const MAX_KEY = 15;
 
 function getScore(par: number, timer: number, level: number) {
-    level = level + 10;
+    /* Old way */
+    /*level = level + 10;
     const bonus = Math.max(-1, Math.min(1, (par - timer) / (par * 0.4)));
     const adjustedLevel = level + bonus + (bonus < 0 ? -1 : 0);
     const levelsAbove10 = Math.max(0, level - 10);
     const numberAffixes = (level < 15 ? 1 : (level > 19 ? 3 : 2));
 
-    return 20 + (adjustedLevel * 5) + (levelsAbove10 * 2) + (numberAffixes * 10);
+    return 20 + (adjustedLevel * 5) + (levelsAbove10 * 2) + (numberAffixes * 10);*/
+
+    /* New Way */
+    const runTimePercentage = Math.min((par - timer) / par, 0.4);
+    const multiplier = level + getNumberOfAffixes(level);
+    const baseRating = 125 + (multiplier * 15);
+
+    return (baseRating + (runTimePercentage * 37.5));
+}
+
+function getNumberOfAffixes(level: number) {
+    if (level < 4)
+        return 0;
+
+    if (level < 7)
+        return 1;
+
+    if (level < 10)
+        return 2;
+
+    return 3;
 }
 
 export function getScoreLevels(par: number, level: number, score: number) {
@@ -166,7 +188,7 @@ export function getScoreLevels(par: number, level: number, score: number) {
     };
 }
 
-function RatingByKey ({affix, runData}: RatingByKeyProps) {
+function RatingByKey ({runData}: RatingByKeyProps) {
 
     const [error, setError] = useState<Error | null>(null);
     const [dungeons, setDungeons] = useState<RaiderIODungeon[] | null>(null);
@@ -182,56 +204,31 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
 
             if (!data[zone_id]) {
                 data[zone_id] = { 
-                    fortified: { level: null, timer: null, score: 0, rating: 0},
-                    tyrannical: { level: null, timer: null, score: 0, rating: 0},
-                    levels: [],
-                    total_rating: 0
+                    bestRun: { level: null, timer: null, score: 0},
+                    levels: []
                 };
             }
 
             const dataRow = data[run.zone_id];
-            const runAffix = run.affixes[0].name;
 
             if (run.mythic_level > highestKeyCompleted) {
                 highestKeyCompleted = run.mythic_level;
             }
 
-            if (runAffix === "Fortified") {
-                dataRow.fortified.level = run.mythic_level;
-                dataRow.fortified.timer = run.clear_time_ms;
-                dataRow.fortified.score = run.score;
-            }
+            dataRow.bestRun.level = run.mythic_level;
+            dataRow.bestRun.timer = run.clear_time_ms;
+            dataRow.bestRun.score = run.score;
 
-            if (runAffix === "Tyrannical") {
-                dataRow.tyrannical.level = run.mythic_level;
-                dataRow.tyrannical.timer = run.clear_time_ms;
-                dataRow.tyrannical.score = run.score;
-            }
+            for (let level = 2; level <= MAX_KEY; ++level) {
+                const scoreLevels = getScoreLevels(run.par_time_ms, level, run.score);
 
-            const fortScore = dataRow.fortified.score ?? 0;
-            const tyranScore = dataRow.tyrannical.score ?? 0;
-            if (fortScore >= tyranScore) {
-                dataRow.fortified.rating = 1.5 * fortScore;
-                dataRow.tyrannical.rating = 0.5 * tyranScore;
-            } else {
-                dataRow.fortified.rating = 0.5 * fortScore;
-                dataRow.tyrannical.rating = 1.5 * tyranScore;
-            }
+                if (scoreLevels.target === 0)
+                    continue;
 
-            dataRow.total_rating = dataRow.fortified.rating + dataRow.tyrannical.rating;
+                dataRow.levels[level] = scoreLevels;
 
-            if (runAffix === affix) {
-                for (let level = 2; level <= MAX_KEY; ++level) {
-                    const scoreLevels = getScoreLevels(run.par_time_ms, level, run.score);
-
-                    if (scoreLevels.target === 0)
-                        continue;
-
-                    dataRow.levels[level] = scoreLevels;
-
-                    if (level < lowestKeyWithRating) {
-                        lowestKeyWithRating = level;
-                    }
+                if (level < lowestKeyWithRating) {
+                    lowestKeyWithRating = level;
                 }
             }
         });
@@ -240,28 +237,35 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
         setHighestKey(Math.min(MAX_KEY, Math.max(20, highestKeyCompleted + 10)))
 
         return data;
-    }, [affix, runData]);
+    }, [runData]);
 
     useEffect(() => {
-        if (affix == null || runData == null) {
+        if (runData == null) {
             return;
         }
 
-        fetch("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + DRAGONFLIGHT_EXPANSION)
+        fetch("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION)
             .then(res => res.json())
             .then((result: RaiderIOStaticData) => {
                 if (result.seasons.length === 0) {
                     return;
                 }
 
-                setDungeons(result.seasons[0].dungeons);
+                for (var i = 0; i < result.seasons.length; ++i)
+                {
+                    if (result.seasons[i].is_main_season === true)
+                    {
+                        setDungeons(result.seasons[i].dungeons);
+                        break;
+                    }
+                }
             },
             (error) => {
                 setError(error);
             })
-    }, [affix, runData])
+    }, [runData])
 
-    if (affix == null || runData == null) {
+    if (runData == null) {
         return <div></div>
     }
 
@@ -275,9 +279,7 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
                 <tr>
                     <th rowSpan={2}>Dungeon</th>
                     <th colSpan={4}>Timers</th>
-                    <th className="fortified" colSpan={4}><img width="16" height="16" src="https://assets.rpglogs.com/img/warcraft/abilities/ability_toughness.jpg" alt="Fortified" /> Fortified</th>
-                    <th className="tyrannical" colSpan={4}><img width="16" height="16" src="https://assets.rpglogs.com/img/warcraft/abilities/achievement_boss_archaedas.jpg" alt="Tyrannical" />Tyrannical</th>
-                    <th className="rating" rowSpan={2}>Total</th>
+                    <th colSpan={4}>Best Run</th>
                     <th colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
@@ -287,17 +289,10 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
                     <th>+3</th>
                     <th>Fail</th>
 
-                    {/* Fortified */}
-                    <th className="fortified level">Level</th>
-                    <th className="fortified timer">Timer</th>
-                    <th className="fortified score">Score</th>
-                    <th className="fortified rating">Rating</th>
-
-                    {/* Tyrannical */}
-                    <th className="tyrannical level">Level</th>
-                    <th className="tyrannical timer">Timer</th>
-                    <th className="tyrannical score">Score</th>
-                    <th className="tyrannical rating">Rating</th>
+                    {/* Best Run */}
+                    <th className="level">Level</th>
+                    <th className="timer">Timer</th>
+                    <th className="score">Score</th>
 
                     {/* Keys */}
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
@@ -315,7 +310,6 @@ function RatingByKey ({affix, runData}: RatingByKeyProps) {
                         index={ix} 
                         dungeon={dungeon} 
                         playerData={tableData[dungeon.id] ?? new TableData()}
-                        affix={affix}
                         highestKey={highestKey}
                         lowestKey={lowestKey}
                     />

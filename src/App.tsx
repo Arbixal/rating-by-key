@@ -8,12 +8,7 @@ import { useParams } from 'react-router-dom';
 function App() {
 
   const {region, realm, character} = useParams();
-  const [affix, setAffix] = useState<string | null>(null);
   const [runData, setRunData] = useState<RaiderIORun[] | null>(null);
-
-  const onAffixChange= useCallback((data: string | null) => {
-    setAffix(data);
-  }, [setAffix]);
   
   const onRunDataChange = useCallback((data: RaiderIORun[] | null) => {
     setRunData(data);
@@ -24,9 +19,9 @@ function App() {
       <header className="App-header">
         Rating by Key
       </header>
-      <CurrentAffixes onDataChange={onAffixChange} />
+      <CurrentAffixes />
       <CharacterSelector onDataChange={onRunDataChange} region={region ?? 'us'} realm={realm ?? ''} character={character ?? ''} />
-      <RatingByKey affix={affix} runData={runData} />
+      <RatingByKey runData={runData} />
     </div>
   );
 }

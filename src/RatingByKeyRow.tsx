@@ -5,30 +5,9 @@ import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
 import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, XAxis } from "recharts";
 
-const SEASON_3_TIMERS: {[index: number]: number} = {
-    9028: 1800999, // Atal'Dazar
-    7805: 2160999, // Black Rook Hold
-    1000010: 2040999, // Galakrond's Fall
-    1000011: 2160999, // Murozond's Rise
-    7673: 1800999, // Darkheart Thicket
-    7109: 1980999, // The Everbloom
-    4738: 2040999, // The Throne of the Tides
-    9424: 2220999, // Warcrest Manor
-
-    14032: 1920999, // Algethar Academy
-    13991: 2100999, // Brackenhide Hollow
-    14082: 2100999, // Halls of Infusion
-    14011: 1980999, // Neltharus
-    14063: 1800999, // Ruby Life Pools
-    13954: 2250999, // The Azure Vault
-    13982: 2400999, // The Nokhud Offensive
-    13968: 2040999, // Uldaman Legacy of Tyr
-};
-
 interface RatingByKeyRowProps {
     dungeon: RaiderIODungeon,
     playerData: TableData,
-    affix: string,
     highestKey: number,
     lowestKey: number,
     index: number,
@@ -41,15 +20,15 @@ class RatingRangeWithDeltas implements RatingRange {
     plus3: number;
     fail: number;
 
-    constructor(ratingRange: RatingRange, playerScore: number, alternateScore: number) {
+    constructor(ratingRange: RatingRange, playerScore: number) {
         this.level = ratingRange.level;
 
-        const oldRating = calculateTotalRating(playerScore, alternateScore);
+        //const oldRating = calculateTotalRating(playerScore, alternateScore);
 
-        this.fail = calculateTotalRating(playerScore + ratingRange.fail, alternateScore) - oldRating;
-        this.target = calculateTotalRating(playerScore + ratingRange.target, alternateScore) - oldRating;
-        this.plus2 = calculateTotalRating(playerScore + ratingRange.plus2, alternateScore) - oldRating;
-        this.plus3 = calculateTotalRating(playerScore + ratingRange.plus3, alternateScore) - oldRating;
+        this.fail = ratingRange.fail;
+        this.target = ratingRange.target;
+        this.plus2 = ratingRange.plus2;
+        this.plus3 = ratingRange.plus3;
     }
 
     get targetRange(): number[] {
@@ -85,17 +64,14 @@ function calculateTotalRating(fort: number, tyran: number) {
     return (fort * 0.5) + (tyran * 1.5);
 }
 
-function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, index}: RatingByKeyRowProps) {
+function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: RatingByKeyRowProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
 
-    const parTimer = SEASON_3_TIMERS[dungeon.id];
+    const parTimer = (dungeon.keystone_timer_seconds * 1000) + 999; //SEASON_3_TIMERS[dungeon.id];
     const target = new Date(parTimer);
     const plus2 = new Date(parTimer - (parTimer * 0.2));
     const plus3 = new Date(parTimer - (parTimer * 0.4));
     const fail = new Date(parTimer + (parTimer * 0.4));
-
-    const playerScore: number = (affix === "Fortified" ? playerData.fortified.score : playerData.tyrannical.score);
-    const alternateScore: number = (affix === "Fortified" ? playerData.tyrannical.score : playerData.fortified.score);
 
     const handleExpandClick = (e: MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
@@ -121,9 +97,9 @@ function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, inde
 
     const levelData: RatingRangeWithDeltas[] = [...Array(highestKey-lowestKey+1)].map(((_,lix) => {
         const mLevel = lowestKey+lix;
-        const x = playerData.levels[mLevel] ?? getScoreLevels(parTimer, mLevel, playerScore);
+        const x = playerData.levels[mLevel] ?? getScoreLevels(parTimer, mLevel, playerData.bestRun.score);
 
-        return new RatingRangeWithDeltas(x, playerScore, alternateScore)
+        return new RatingRangeWithDeltas(x, playerData.bestRun.score)
     }))
 
     return (
@@ -136,17 +112,9 @@ function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, inde
         <td className="timePlus3">{formatTime(plus3)}</td>
         <td className="timeFail">{formatTime(fail)}</td>
 
-        <td className="fortified level">{playerData.fortified?.level}</td>
-        <td className="fortified timer">{playerData.fortified?.timer ? formatTime(new Date(playerData.fortified.timer)) : null}</td>
-        <td className="fortified score">{playerData.fortified?.score.toFixed(1)}</td>
-        <td className="fortified rating">{playerData.fortified?.rating.toFixed(1)}</td>
-
-        <td className="tyrannical level">{playerData.tyrannical?.level}</td>
-        <td className="tyrannical timer">{playerData.tyrannical?.timer ? formatTime(new Date(playerData.tyrannical.timer)) : null}</td>
-        <td className="tyrannical score">{playerData.tyrannical?.score.toFixed(1)}</td>
-        <td className="tyrannical rating">{playerData.tyrannical?.rating.toFixed(1)}</td>
-
-        <td>{playerData.total_rating.toFixed(1)}</td>
+        <td className="level">{playerData.bestRun?.level}</td>
+        <td className="timer">{playerData.bestRun?.timer ? formatTime(new Date(playerData.bestRun.timer)) : null}</td>
+        <td className="score">{playerData.bestRun?.score.toFixed(1)}</td>
 
         {levelData.map(((lData,lix) => (
                 <td className={lix % 2 === 0 ? 'evenCol' : 'oddCol'} key={lData.level}>{lData.target === 0.0 ? "" : (lData.target).toFixed(1)}</td>
@@ -157,7 +125,7 @@ function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, inde
     </tr>
     {expanded && (
         <tr className={index % 2 === 0 ? 'event' : 'odd'}>
-            <td colSpan={13}>&nbsp;</td>
+            <td colSpan={7}>&nbsp;</td>
             <td colSpan={highestKey-lowestKey+2} height="300">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart 
@@ -171,10 +139,6 @@ function RatingByKeyRow({dungeon, playerData, affix, highestKey, lowestKey, inde
                             cursor={{stroke:"#555555", fill: "#222222"}}
                          />
                         <Legend align="center" />
-                        {/* <Bar dataKey="fail" name="Minimum" fill="#222222" legendType="none" /> */}
-                        {/* <Bar dataKey="targetRange" name="Failed" fill="#AC1F39" />
-                        <Bar dataKey="plus2Range" name="Timed" fill="#FFC84A" />
-                        <Bar dataKey="plus3Range" name="+2" fill="#4ec04e" /> */}
 
                         <Bar dataKey="fail" name="Minimum" stackId="1" fill="#222222" legendType="none" activeBar={false} />
                         <Bar dataKey="targetDelta" name="Failed" stackId="1" fill="#AC1F39" activeBar={false} />

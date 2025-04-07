@@ -433,7 +433,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         fetch("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase() 
             + "&realm=" + realmLocal.toLowerCase() 
             + "&name=" + characterLocal.toLowerCase() 
-            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_alternate_runs")
+            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs")
             .then(resp =>  resp.json())
             .then((result: RaiderIOCharacter) => {
                 if (result.statusCode && result.statusCode !== 200) {
@@ -458,7 +458,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     rating_color: rating_color,
                 });
                 setError(null);
-                onDataChange([...result.mythic_plus_best_runs,...result.mythic_plus_alternate_runs]);
+                onDataChange([...result.mythic_plus_best_runs]);
                 setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
             },
             (error) => {
