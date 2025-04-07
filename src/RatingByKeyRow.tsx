@@ -56,14 +56,6 @@ class RatingRangeWithDeltas implements RatingRange {
     }
 }
 
-function calculateTotalRating(fort: number, tyran: number) {
-    if (fort > tyran) {
-        return (fort * 1.5) + (tyran * 0.5);
-    }
-
-    return (fort * 0.5) + (tyran * 1.5);
-}
-
 function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: RatingByKeyRowProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
 
