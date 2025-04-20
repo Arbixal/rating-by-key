@@ -45,6 +45,6 @@
     ]
   },
   "devDependencies": {
-    "@tsconfig/create-react-app": "^2.0.2"
+    "@tsconfig/create-react-app": "^2.0.5"
   }
 }
