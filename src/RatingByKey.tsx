@@ -251,9 +251,14 @@ function RatingByKey ({runData}: RatingByKeyProps) {
                     return;
                 }
 
+                var now: Date = new Date();
+
                 for (var i = 0; i < result.seasons.length; ++i)
                 {
-                    if (result.seasons[i].is_main_season === true)
+                    var startDate: Date = new Date(result.seasons[i].starts.us);
+                    var endDate: Date = new Date(result.seasons[i].ends.us ?? "2099-12-31T23:59:59Z");
+
+                    if (result.seasons[i].is_main_season === true && startDate < now && endDate > now)
                     {
                         setDungeons(result.seasons[i].dungeons);
                         break;
