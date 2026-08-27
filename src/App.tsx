@@ -3,7 +3,7 @@ import './App.css';
 import CharacterSelector, {RaiderIORun} from './CharacterSelector';
 import CurrentAffixes from './CurrentAffixes';
 import RatingByKey from './RatingByKey';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 function App() {
 

@@ -325,7 +325,7 @@ import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
 import { Affix } from "./CurrentAffixes";
 import RecentCharacters, { CharacterInput } from "./RecentCharacters";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 interface RaiderIOCharacter extends RaiderIOError {
     name: string,
