@@ -37,6 +37,7 @@ S3/CloudFront fallback configuration.
 - Vitest with jsdom and Testing Library
 - Playwright with Chromium for browser-level tests
 - Node.js `>=22.22.0`
+- `@types/node` `22.20.1`
 
 The application uses React Router Data Mode through `createBrowserRouter`, but
 does not use SSR, loaders, actions, fetchers, or the React Router framework
