@@ -11,8 +11,17 @@ export type CharacterInput = {
 
 function isCharacterInput(value: unknown): value is CharacterInput[] {
     return Array.isArray(value) && value.every((item) => {
-        return typeof item === "object" && item !== null
-            && "region" in item && "realm" in item && "name" in item;
+        if (typeof item !== "object" || item === null || Array.isArray(item)) {
+            return false;
+        }
+
+        const candidate = item as Record<string, unknown>;
+        return typeof candidate.region === "string"
+            && typeof candidate.realm === "string"
+            && typeof candidate.name === "string"
+            && typeof candidate.playerClass === "string"
+            && typeof candidate.lastAccessed === "number"
+            && Number.isFinite(candidate.lastAccessed);
     });
 }
 
@@ -27,12 +36,19 @@ function characterEquals(compare1: CharacterInput, compare2: CharacterInput) {
 }
 
 function RecentCharacters({selectedCharacter}: RecentCharactersProps) {
-    const [recents, setRecents] = useState(() => {
+    const [recents, setRecents] = useState<CharacterInput[]>(() => {
         const saved: string | null = localStorage.getItem("characters");
-        const initialValue = JSON.parse(saved ?? "[]");
+        if (saved === null) {
+            return [];
+        }
 
-        if (isCharacterInput(initialValue)) {
-            return initialValue;
+        try {
+            const initialValue: unknown = JSON.parse(saved);
+            if (isCharacterInput(initialValue)) {
+                return initialValue;
+            }
+        } catch {
+            return [];
         }
 
         return [];

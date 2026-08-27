@@ -158,6 +158,19 @@ describe('current affix request cleanup', () => {
 });
 
 describe('recent character persistence', () => {
+  test('ignores malformed local storage data', () => {
+    localStorage.setItem('characters', '{not valid json');
+
+    render(
+      <MemoryRouter>
+        <RecentCharacters selectedCharacter={null} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Recent Characters:')).toBeInTheDocument();
+    expect(localStorage.getItem('characters')).toBe('[]');
+  });
+
   test('persists a copied character without mutating the selected prop', async () => {
     const selectedCharacter: CharacterInput = {
       region: 'us',
