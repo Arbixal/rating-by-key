@@ -1,5 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow validates, builds, and deploys the static Vite application.
 
 name: Node.js CI
 
@@ -15,9 +14,7 @@ jobs:
     strategy:
       matrix:
         node-version: [22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        # Vite 8 / Vitest 4 require Node >=20.19 (or >=22.12); using the current
-        # Active LTS line.
+        # React Router 8 requires Node >=22.22.0; use the current Active LTS line.
 
     steps:
     - uses: actions/checkout@v4
@@ -26,8 +23,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
+    - name: Install dependencies
+      run: npm ci
+    - name: Lint
+      run: npm run lint
+    - name: Test
+      run: npm test
+    - name: Build
+      run: npm run build
     - name: Store Artifacts
       uses: actions/upload-artifact@v4
       with:

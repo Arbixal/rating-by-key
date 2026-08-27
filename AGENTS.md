@@ -65,7 +65,7 @@ npm run lint
 Run tests once:
 
 ```sh
-npm test -- --run
+npm test
 ```
 
 Build for production:
@@ -108,12 +108,14 @@ The workflow:
 
 1. Uses Node `22.x`.
 2. Runs `npm ci`.
-3. Runs `npm run build`.
-4. Uploads the `build` directory as an artifact.
-5. Downloads the artifact in a separate deployment job.
-6. Uses GitHub Secrets for AWS credentials.
-7. Uploads the artifact to the configured S3 bucket.
-8. Invalidates the CloudFront distribution's `/index.html` path.
+3. Runs `npm run lint`.
+4. Runs `npm test`.
+5. Runs `npm run build`.
+6. Uploads the `build` directory as an artifact.
+7. Downloads the artifact in a separate deployment job.
+8. Uses GitHub Secrets for AWS credentials.
+9. Uploads the artifact to the configured S3 bucket.
+10. Invalidates the CloudFront distribution's `/index.html` path.
 
 Do not store AWS credentials, GitHub tokens, or other secret values in this
 file or the repository. The S3 bucket, CloudFront distribution, and secret
@@ -129,7 +131,7 @@ link such as `/us/nagrand/bixwar` after deployment.
 The following checks have passed after the migration and dependency upgrades:
 
 - `npm run lint`
-- `npm test -- --run`
+- `npm test`
 - `npm run build`
 - `npm audit`
 - `npm audit --omit=dev`

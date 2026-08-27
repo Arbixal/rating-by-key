@@ -22,7 +22,7 @@ npm run dev
 Run the test suite once:
 
 ```sh
-npm test -- --run
+npm test
 ```
 
 Run the linter:
