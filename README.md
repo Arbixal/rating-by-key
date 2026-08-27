@@ -31,6 +31,13 @@ Run the linter:
 npm run lint
 ```
 
+Run the browser tests after building the application:
+
+```sh
+npm run build
+npm run test:e2e
+```
+
 ## Production
 
 Build the application:

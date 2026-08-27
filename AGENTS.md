@@ -35,6 +35,7 @@ S3/CloudFront fallback configuration.
 - `@fortawesome/react-fontawesome` `3.5.0`
 - Vite `8.2.2`
 - Vitest with jsdom and Testing Library
+- Playwright with Chromium for browser-level tests
 - Node.js `>=22.22.0`
 
 The application uses React Router Data Mode through `createBrowserRouter`, but
@@ -66,6 +67,13 @@ Run tests once:
 
 ```sh
 npm test
+```
+
+Run browser tests after building the application:
+
+```sh
+npm run build
+npm run test:e2e
 ```
 
 Build for production:
@@ -111,11 +119,13 @@ The workflow:
 3. Runs `npm run lint`.
 4. Runs `npm test`.
 5. Runs `npm run build`.
-6. Uploads the `build` directory as an artifact.
-7. Downloads the artifact in a separate deployment job.
-8. Uses GitHub Secrets for AWS credentials.
-9. Uploads the artifact to the configured S3 bucket.
-10. Invalidates the CloudFront distribution's `/index.html` path.
+6. Installs the Chromium browser for Playwright.
+7. Runs `npm run test:e2e`.
+8. Uploads the `build` directory as an artifact.
+9. Downloads the artifact in a separate deployment job.
+10. Uses GitHub Secrets for AWS credentials.
+11. Uploads the artifact to the configured S3 bucket.
+12. Invalidates the CloudFront distribution's `/index.html` path.
 
 Do not store AWS credentials, GitHub tokens, or other secret values in this
 file or the repository. The S3 bucket, CloudFront distribution, and secret
@@ -136,6 +146,7 @@ The following checks have passed after the migration and dependency upgrades:
 - `npm audit`
 - `npm audit --omit=dev`
 - `npx tsc --noEmit`
+- `npm run test:e2e`
 - Production root and deep-link HTTP checks
 
 The production workflow has also completed successfully on Node 22, including
