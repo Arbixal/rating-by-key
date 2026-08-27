@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import './App.css';
 import CharacterSelector, {RaiderIORun} from './CharacterSelector';
 import CurrentAffixes from './CurrentAffixes';
-import RatingByKey from './RatingByKey';
 import { useParams } from 'react-router';
+
+const RatingByKey = lazy(() => import('./RatingByKey'));
 
 function App() {
 
@@ -21,7 +22,11 @@ function App() {
       </header>
       <CurrentAffixes />
       <CharacterSelector onDataChange={onRunDataChange} region={region ?? 'us'} realm={realm ?? ''} character={character ?? ''} />
-      <RatingByKey runData={runData} />
+      {runData !== null && (
+        <Suspense fallback={<div>Loading ratings...</div>}>
+          <RatingByKey runData={runData} />
+        </Suspense>
+      )}
     </div>
   );
 }
