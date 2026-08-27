@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { RaiderIODungeon, RatingRange, TableData, getScoreLevels } from "./RatingByKey";
+import { getScoreLevels, TableData } from "./ratingData";
+import type { RaiderIODungeon, RatingRange } from "./ratingData";
 import { formatTime } from "./utils";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
@@ -20,7 +21,7 @@ class RatingRangeWithDeltas implements RatingRange {
     plus3: number;
     fail: number;
 
-    constructor(ratingRange: RatingRange, playerScore: number) {
+    constructor(ratingRange: RatingRange) {
         this.level = ratingRange.level;
 
         //const oldRating = calculateTotalRating(playerScore, alternateScore);
@@ -91,7 +92,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         const mLevel = lowestKey+lix;
         const x = playerData.levels[mLevel] ?? getScoreLevels(parTimer, mLevel, playerData.bestRun.score);
 
-        return new RatingRangeWithDeltas(x, playerData.bestRun.score)
+        return new RatingRangeWithDeltas(x)
     }))
 
     return (

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
 import RatingByKeyRow from "./RatingByKeyRow";
+import { getScoreLevels, TableData } from "./ratingData";
+import type { RaiderIODungeon } from "./ratingData";
 
 // https://raider.io/api/v1/mythic-plus/static-data?expansion_id=9
 /*
@@ -105,88 +107,12 @@ interface RaiderIOSeason {
     dungeons: RaiderIODungeon[],
 }
 
-export interface RaiderIODungeon {
-    id: number,
-    challenge_mode_id: number,
-    slug: string,
-    name: string,
-    short_name: string,
-    keystone_timer_seconds: number,
-    icon_url: string,
-    background_image_url: string
-}
-
 interface RatingByKeyProps {
     runData: RaiderIORun[] | null,
 }
 
-interface AffixSummary {
-    level: number | null,
-    timer: number | null,
-    score: number,
-};
-
-export interface RatingRange {
-    level: number;
-    target: number;
-    plus2: number;
-    plus3: number;
-    fail: number;
-}
-
-export class TableData {
-    bestRun: AffixSummary = { level: null, timer: null, score: 0};
-    levels: {[index: number] : RatingRange} = {};
-}
-
 const CURRENT_EXPANSION = 11;
 const MAX_KEY = 15;
-
-function getScore(par: number, timer: number, level: number) {
-    /* Old way */
-    /*level = level + 10;
-    const bonus = Math.max(-1, Math.min(1, (par - timer) / (par * 0.4)));
-    const adjustedLevel = level + bonus + (bonus < 0 ? -1 : 0);
-    const levelsAbove10 = Math.max(0, level - 10);
-    const numberAffixes = (level < 15 ? 1 : (level > 19 ? 3 : 2));
-
-    return 20 + (adjustedLevel * 5) + (levelsAbove10 * 2) + (numberAffixes * 10);*/
-
-    /* New Way */
-    const runTimePercentage = Math.min((par - timer) / par, 0.4);
-    const multiplier = level + getNumberOfAffixes(level);
-    const baseRating = 125 + (multiplier * 15);
-
-    return (baseRating + (runTimePercentage * 37.5));
-}
-
-function getNumberOfAffixes(level: number) {
-    if (level < 4)
-        return 0;
-
-    if (level < 7)
-        return 1;
-
-    if (level < 10)
-        return 2;
-
-    return 3;
-}
-
-export function getScoreLevels(par: number, level: number, score: number) {
-    const targetScore = getScore(par, par, level);
-    const plus2Score = getScore(par, par - (par * 0.2), level);
-    const plus3Score = getScore(par, par - (par * 0.4), level);
-    const failScore = getScore(par, par + (par * 0.4), level);
-
-    return {
-        level: level, 
-        target: Math.max(0,targetScore - score), 
-        plus2: Math.max(0,plus2Score - score), 
-        plus3: Math.max(0,plus3Score - score), 
-        fail: Math.max(0,failScore - score)
-    };
-}
 
 function RatingByKey ({runData}: RatingByKeyProps) {
 
@@ -195,11 +121,11 @@ function RatingByKey ({runData}: RatingByKeyProps) {
     const [lowestKey, setLowestKey] = useState<number>(2);
     const [highestKey, setHighestKey] = useState<number>(MAX_KEY);
     const tableData: {[index: number]: TableData} = useMemo(() => {
-        let data: {[index: number]: TableData} = {};
+        const data: {[index: number]: TableData} = {};
         let lowestKeyWithRating = 99;
         let highestKeyCompleted = 0;
 
-        runData?.forEach((run, ix) => {
+        runData?.forEach((run) => {
             const zone_id = run.zone_id;
 
             if (!data[zone_id]) {
@@ -251,12 +177,12 @@ function RatingByKey ({runData}: RatingByKeyProps) {
                     return;
                 }
 
-                var now: Date = new Date();
+                const now: Date = new Date();
 
-                for (var i = 0; i < result.seasons.length; ++i)
+                for (let i = 0; i < result.seasons.length; ++i)
                 {
-                    var startDate: Date = new Date(result.seasons[i].starts.us);
-                    var endDate: Date = new Date(result.seasons[i].ends.us ?? "2099-12-31T23:59:59Z");
+                    const startDate: Date = new Date(result.seasons[i].starts.us);
+                    const endDate: Date = new Date(result.seasons[i].ends.us ?? "2099-12-31T23:59:59Z");
 
                     if (result.seasons[i].is_main_season === true && startDate < now && endDate > now)
                     {

@@ -9,8 +9,11 @@ export type CharacterInput = {
     lastAccessed: number;
 };
 
-function isCharacterInput(o: any): o is CharacterInput[] {
-    return Array.isArray(o) && o.every((item) => "region" in item && "realm" in item && "name" in item);
+function isCharacterInput(value: unknown): value is CharacterInput[] {
+    return Array.isArray(value) && value.every((item) => {
+        return typeof item === "object" && item !== null
+            && "region" in item && "realm" in item && "name" in item;
+    });
 }
 
 interface RecentCharactersProps {
@@ -55,7 +58,7 @@ function RecentCharacters({selectedCharacter}: RecentCharactersProps) {
             recents.unshift(selectedCharacter);
         }
 
-        var newArray = recents
+        const newArray = recents
                         .toSorted((a,b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))
                         .slice(0, 5);
 
