@@ -30,7 +30,7 @@
 }
 */
 
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import "./CurrentAffixes.css";
 
 export interface Affix {
@@ -48,11 +48,43 @@ interface AffixesResult {
     affix_details: Affix[];
 }
 
+function matchesTouchDevice(): boolean {
+    return typeof window !== "undefined"
+        && typeof window.matchMedia === "function"
+        && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+}
+
 function CurrentAffixes()
 {
     const [error, setError] = useState<Error | null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [affixes, setAffixes] = useState<Affix[]>([]);
+    const [isTouchDevice, setIsTouchDevice] = useState(matchesTouchDevice);
+    const [expandedAffixId, setExpandedAffixId] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== "function") {
+            return;
+        }
+
+        const mediaQuery = window.matchMedia("(hover: none) and (pointer: coarse)");
+        const updateTouchDevice = () => {
+            setIsTouchDevice(mediaQuery.matches);
+            if (!mediaQuery.matches) {
+                setExpandedAffixId(null);
+            }
+        };
+
+        if (typeof mediaQuery.addEventListener === "function") {
+            mediaQuery.addEventListener("change", updateTouchDevice);
+
+            return () => mediaQuery.removeEventListener("change", updateTouchDevice);
+        }
+
+        mediaQuery.addListener(updateTouchDevice);
+
+        return () => mediaQuery.removeListener(updateTouchDevice);
+    }, []);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -78,6 +110,15 @@ function CurrentAffixes()
 
         return () => controller.abort();
     }, [])
+
+    const handleAffixClick = (event: MouseEvent<HTMLAnchorElement>, affixId: number): void => {
+        if (!isTouchDevice) {
+            return;
+        }
+
+        event.preventDefault();
+        setExpandedAffixId((currentAffixId) => currentAffixId === affixId ? null : affixId);
+    };
 
     if (error) {
         return (
@@ -106,10 +147,22 @@ function CurrentAffixes()
             <ul className="affixList">
                 {affixes.map(affix => (
                     <li className="affixItem" key={affix.id}>
-                        <a className="affixLink" href={affix.wowhead_url}>
+                        <a
+                            className="affixLink"
+                            href={affix.wowhead_url}
+                            onClick={(event) => handleAffixClick(event, affix.id)}
+                            aria-controls={isTouchDevice ? `affix-details-${affix.id}` : undefined}
+                            aria-expanded={isTouchDevice ? expandedAffixId === affix.id : undefined}
+                        >
                             <img className="affixIcon" width="40" height="40" src={"https://assets.rpglogs.com/img/warcraft/abilities/" + affix.icon + ".jpg"} alt={affix.name}/>
                             <span className="affixName">{affix.name}</span>
                         </a>
+                        {isTouchDevice && expandedAffixId === affix.id && (
+                            <div className="affixDetails" id={`affix-details-${affix.id}`}>
+                                <p>{affix.description}</p>
+                                <a className="affixDetailsLink" href={affix.wowhead_url}>View on Wowhead</a>
+                            </div>
+                        )}
                     </li>
                 ))}
             </ul>

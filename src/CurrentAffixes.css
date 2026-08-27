@@ -5,6 +5,10 @@
     padding: 16px;
 }
 
+.affixItem {
+    min-width: 0;
+}
+
 .affixBox--status p {
     color: var(--muted-text);
     margin: 10px 0 0;
@@ -61,6 +65,40 @@
 .affixName {
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+.affixDetails {
+    background-color: var(--surface-highlight);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-top: 6px;
+    max-width: 280px;
+    padding: 10px;
+}
+
+.affixDetails p {
+    color: var(--muted-text);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    margin: 0 0 9px;
+}
+
+.affixDetailsLink {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 9px;
+    text-decoration: none;
+}
+
+.affixDetailsLink:hover,
+.affixDetailsLink:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
 }
 
 @media (max-width: 600px) {
