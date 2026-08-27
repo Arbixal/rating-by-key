@@ -1,25 +1,123 @@
-div.inputPanel {
-    display: flex;
+.characterWorkspace {
+    align-items: start;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 340px);
+    margin-top: 16px;
 }
 
-div.inputDescription {
-    margin: 5px;
-    margin-right: 25px;
-    vertical-align: middle;
+.characterLookup {
+    min-width: 0;
 }
 
-div.inputField {
+.selectorPanel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.panelHint {
+    color: var(--muted-text);
+    font-size: 0.75rem;
+    padding-top: 3px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.inputPanel {
+    align-items: end;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(84px, 0.45fr) minmax(150px, 0.9fr) minmax(160px, 1fr) auto;
+    margin-top: 16px;
+}
+
+.inputField {
     display: flex;
     flex-direction: column;
-    margin: 5px;
+    gap: 6px;
+    min-width: 0;
 }
 
-div.inputField label {
-    margin-bottom: 5px;
-    font-size: small;
+.inputField label {
+    color: var(--muted-text);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-div.error_message {
-    margin-left: 150px;
-    color: #FF9999;
+.inputField input,
+.inputField select {
+    background-color: var(--surface-raised);
+    border: 1px solid #555555;
+    border-radius: 5px;
+    color: var(--text);
+    min-height: 38px;
+    padding: 7px 10px;
+    width: 100%;
+}
+
+.inputField input:focus,
+.inputField select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(32, 144, 192, 0.25);
+    outline: none;
+}
+
+.primaryButton {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+    min-height: 38px;
+    padding: 7px 14px;
+    white-space: nowrap;
+}
+
+.primaryButton:hover,
+.primaryButton:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
+}
+
+.error_message {
+    background-color: rgba(172, 31, 57, 0.16);
+    border: 1px solid var(--danger);
+    border-radius: 5px;
+    color: #ff9999;
+    margin-top: 12px;
+    padding: 9px 11px;
+}
+
+@media (max-width: 900px) {
+    .characterWorkspace {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .selectorPanel {
+        padding: 12px;
+    }
+
+    .panelHint {
+        display: none;
+    }
+
+    .inputPanel {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .inputField--character,
+    .inputField--submit {
+        grid-column: 1 / -1;
+    }
+
+    .primaryButton {
+        width: 100%;
+    }
 }

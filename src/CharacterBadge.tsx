@@ -22,18 +22,23 @@ function CharacterBadge({name, character_class, thumbnail_url, profile_url, rati
     const cssClass = character_class.toLowerCase().replace(" ", "_");
 
     return (
-        <div className="characterPanel">
-            <div className="characterThumbnail"><img src={thumbnail_url} alt="Character thumbnail" /></div>
-            <div className="verticalFlex">
+        <article className="characterPanel">
+            <div className="characterThumbnail">
+                <img src={thumbnail_url} alt={`${name} portrait`} />
+            </div>
+            <div className="characterIdentity">
+                <span className="characterEyebrow">Current character</span>
                 <div className={"characterName " + cssClass}>{name}</div>
-                <div className="characterRating" style={{color: rating_color}}>{rating}</div>
-                <div>
-                    <a href={profile_url} target="_blank" rel="noreferrer">
-                        <img width="24" height="24" alt="RaiderIO link" src="https://cdn.raiderio.net/images/brand/Mark_2ColorWhite.png" />
-                    </a>
+                <div className="characterRatingRow">
+                    <span className="characterRatingLabel">Mythic+ rating</span>
+                    <span className="characterRating" style={{color: rating_color}}>{rating}</span>
                 </div>
             </div>
-        </div>
+            <a className="profileLink" href={profile_url} target="_blank" rel="noreferrer">
+                <img width="20" height="20" alt="" src="https://cdn.raiderio.net/images/brand/Mark_2ColorWhite.png" />
+                <span>Raider.IO</span>
+            </a>
+        </article>
     )
 }
 

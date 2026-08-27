@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import "./RecentCharacters.css";
 
 export type CharacterInput = {
     region: string;
@@ -92,14 +93,42 @@ function RecentCharacters({selectedCharacter}: RecentCharactersProps) {
     }, [recents]);
 
     return (
-        <div className="topArea">
-            Recent Characters:
-            <div className="recent-list">
-            {recents.map((recent) => (
-                <div key={recent.name + "-" + recent.realm} className={"player-name " + recent.playerClass}><Link to={`/${recent.region}/${recent.realm}/${recent.name}`}>{recent.name} - {recent.realm}</Link></div>
-            ))}
+        <section className="recentCharactersPanel" aria-labelledby="recent-characters-heading">
+            <div className="panelHeading">
+                <div>
+                    <span className="panelEyebrow">Quick access</span>
+                    <h2 id="recent-characters-heading">Recent Characters:</h2>
+                </div>
+                <span className="recentCount">{recents.length} / 5</span>
             </div>
-        </div>
+            {recents.length === 0 ? (
+                <p className="emptyRecentCharacters">No characters loaded yet</p>
+            ) : (
+                <ul className="recentCharacterList">
+                    {recents.map((recent) => {
+                        const isSelected = selectedCharacter !== null && characterEquals(recent, selectedCharacter);
+
+                        return (
+                            <li
+                                key={recent.name + "-" + recent.realm}
+                                className={"recentCharacterItem " + recent.playerClass + (isSelected ? " isSelected" : "")}
+                            >
+                                <Link
+                                    className="recentCharacterLink"
+                                    to={`/${recent.region}/${recent.realm}/${recent.name}`}
+                                    aria-current={isSelected ? "page" : undefined}
+                                    aria-label={`${recent.name} - ${recent.realm}`}
+                                >
+                                    <span className="recentCharacterName">{recent.name}</span>
+                                    <span className="recentCharacterLocation">{recent.region.toUpperCase()} / {recent.realm}</span>
+                                    <span className="recentCharacterArrow" aria-hidden="true">&gt;</span>
+                                </Link>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </section>
     )
 }
 

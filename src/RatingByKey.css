@@ -1,22 +1,50 @@
-table {
+.ratingTable {
     background-color: #222222;
     border: solid 1px #444444;
+    border-collapse: collapse;
     margin-left: 5px;
 }
 
-td {
+.ratingTable th,
+.ratingTable td {
+    border-bottom: solid 1px #444444;
+    padding: 7px 9px;
+    vertical-align: middle;
+}
+
+.ratingTable td {
     text-align: right;
 }
 
 .key_rating {
-    min-width: 30px;
+    min-width: 52px;
+    text-align: center;
 }
 
-tr.odd {
+.ratingTable > thead th {
+    background-color: #2b2b2b;
+    color: #eeeeee;
+    padding-bottom: 8px;
+    padding-top: 8px;
+    text-align: center;
+}
+
+.ratingTable > thead .dungeonHeader {
+    text-align: left;
+}
+
+.ratingTable > thead .ratingGroupHeader,
+.ratingTable > thead .bestRunHeader {
+    background-color: #202020;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+}
+
+.ratingTable tr.odd {
     background-color: #222222;
 }
 
-tr.even {
+.ratingTable tr.even {
     background-color: #333333;
 }
 
@@ -36,26 +64,66 @@ tr.even td.tyrannical {
     background-color: #4e340c;
 }
 
-.evenCol {
+.ratingTable .evenCol {
     background-color: #444444;
-    width: 45px;
-    padding-right: 5px;
+    width: 52px;
 }
 
-.oddCol {
-    width: 45px;
-    padding-right: 5px;
+.ratingTable .oddCol {
+    width: 52px;
 }
 
-tr.even > td.evenCol {
+.ratingTable tr.even > td.evenCol {
     background-color: #555555;
+}
+
+.dungeonCell,
+.dungeonHeader {
+    min-width: 175px;
+    text-align: left;
+}
+
+.ratingTable td.dungeonCell {
+    padding-left: 12px;
+}
+
+.ratingTable th.level,
+.ratingTable td.level {
+    min-width: 45px;
+    text-align: center;
+}
+
+.ratingTable th.score,
+.ratingTable td.score {
+    min-width: 65px;
+    text-align: right;
+}
+
+.ratingTable .level,
+.ratingTable .score,
+.ratingTable .ratingKeyCell {
+    font-variant-numeric: tabular-nums;
+}
+
+.ratingKeyHeader,
+.ratingKeyCell {
+    text-align: center !important;
+}
+
+.ratingTable .expandHeader {
+    min-width: 34px;
+}
+
+.projectedTotalCell {
+    font-weight: 700;
+    text-align: right !important;
 }
 
 .rating {
     width: 50px;
 }
 
-.runProgressCell {
+.ratingTable td.runProgressCell {
     min-width: 360px;
     padding: 4px 8px;
     text-align: left;
@@ -217,4 +285,61 @@ tr.even > td.evenCol {
     line-height: 1.1;
     margin-top: 1px;
     white-space: nowrap;
+}
+
+.ratingCell {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 36px;
+    width: 100%;
+}
+
+.ratingCellValue {
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.ratingCellValue--zero {
+    color: #888888;
+}
+
+.ratingThresholdLadder {
+    cursor: help;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 36px;
+    width: 100%;
+}
+
+.ratingThresholdBar {
+    background-color: #555555;
+    border-radius: 1px;
+    display: block;
+    height: 2px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.ratingThresholdBar > span {
+    display: block;
+    height: 100%;
+}
+
+.ratingThresholdBar--plus3 {
+    background-color: #2090c0;
+}
+
+.ratingThresholdBar--plus2 {
+    background-color: #4ec04e;
+}
+
+.ratingThresholdBar--target {
+    background-color: #FFFFFF;
+}
+
+.ratingThresholdBar--fail {
+    background-color: #FFC84A;
 }

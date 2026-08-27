@@ -80,21 +80,40 @@ function CurrentAffixes()
     }, [])
 
     if (error) {
-        return <div>Error: {error.message}</div>
+        return (
+            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading">
+                <h2 id="current-affixes-heading">Current Affixes:</h2>
+                <p>Error: {error.message}</p>
+            </section>
+        )
     } else if (!isLoaded) {
-        return <div>Loading ...</div>
+        return (
+            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading">
+                <h2 id="current-affixes-heading">Current Affixes:</h2>
+                <p>Loading ...</p>
+            </section>
+        )
     } else {
         return (
-            <div className="affixBox">
-            Current Affixes:
-            <ul>
+            <section className="affixBox" aria-labelledby="current-affixes-heading">
+            <div className="panelHeading">
+                <div>
+                    <span className="panelEyebrow">Weekly modifiers</span>
+                    <h2 id="current-affixes-heading">Current Affixes:</h2>
+                </div>
+                <span className="affixCount">{affixes.length} active</span>
+            </div>
+            <ul className="affixList">
                 {affixes.map(affix => (
-                    <li key={affix.id}>
-                        <a href={affix.wowhead_url}><img width="32" height="32" src={"https://assets.rpglogs.com/img/warcraft/abilities/" + affix.icon + ".jpg"} alt={affix.name}/></a>
+                    <li className="affixItem" key={affix.id}>
+                        <a className="affixLink" href={affix.wowhead_url}>
+                            <img className="affixIcon" width="40" height="40" src={"https://assets.rpglogs.com/img/warcraft/abilities/" + affix.icon + ".jpg"} alt={affix.name}/>
+                            <span className="affixName">{affix.name}</span>
+                        </a>
                     </li>
                 ))}
             </ul>
-            </div>
+            </section>
         )
     }
 }

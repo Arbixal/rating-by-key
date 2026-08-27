@@ -490,34 +490,41 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
     }, [region, realm, character, fetchCharacterData]);
 
     return (
-        <div className="topArea">
-          <div>
-            <div className="inputPanel">
-                <div className="inputDescription">Character Select: </div>
-                <div className="inputField">
-                    <label>Region</label>
-                    <select name="region" onChange={(e) => setRegion(e.target.value)} value={regionState}>
+        <div className="characterWorkspace">
+          <div className="characterLookup">
+            <section className="selectorPanel" aria-labelledby="character-lookup-heading">
+                <div className="panelHeading">
+                    <div>
+                        <span className="panelEyebrow">Character lookup</span>
+                        <h2 id="character-lookup-heading">Analyze a character</h2>
+                    </div>
+                    <span className="panelHint">Current Mythic+ profile</span>
+                </div>
+                <div className="inputPanel">
+                <div className="inputField inputField--region">
+                    <label htmlFor="character-region">Region</label>
+                    <select id="character-region" name="region" onChange={(e) => setRegion(e.target.value)} value={regionState}>
                         <option value="us">US</option>
                         <option value="eu">EU</option>
                         <option value="kr">KR</option>
                         <option value="tw">TW</option>
                     </select>
                 </div>
-                <div className="inputField">
-                    <label>Realm</label>
-                    <input type="text" onChange={(e) => setRealm(e.target.value)} value={realmState} />
+                <div className="inputField inputField--realm">
+                    <label htmlFor="character-realm">Realm</label>
+                    <input id="character-realm" type="text" onChange={(e) => setRealm(e.target.value)} value={realmState} />
                 </div>
-                <div className="inputField">
-                    <label>Character</label>
-                    <input type="text" onChange={(e) => setCharacter(e.target.value)} onKeyDown={handleKeyPress} value={characterState} />
+                <div className="inputField inputField--character">
+                    <label htmlFor="character-name">Character</label>
+                    <input id="character-name" type="text" onChange={(e) => setCharacter(e.target.value)} onKeyDown={handleKeyPress} value={characterState} />
                 </div>
-                <div className="inputField">
-                    <label>&nbsp;</label>
-                    <button onClick={handleFetch}>Fetch Character</button>
+                <div className="inputField inputField--submit">
+                    <button className="primaryButton" type="button" onClick={handleFetch}>Fetch Character</button>
                 </div>
-            </div>
+                </div>
+                {error !== null && <div className="error_message" role="alert">{error.message}</div>}
+            </section>
             {characterDetails !== null && <CharacterBadge {...characterDetails} />}
-            {error !== null && <div className="error_message">{error.message}</div>}
           </div>
           <RecentCharacters selectedCharacter={loadedCharacter} />
         </div>

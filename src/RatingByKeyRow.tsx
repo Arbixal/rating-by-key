@@ -3,7 +3,7 @@ import { getDisplayedRatingRange, getTimerThresholds, TableData } from "./rating
 import type { RaiderIODungeon, RatingRange } from "./ratingData";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
-import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, XAxis } from "recharts";
+import { Line, LineChart, Legend, ResponsiveContainer, YAxis, Tooltip, XAxis } from "recharts";
 import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
 import TimerRuler from "./TimerRuler";
 
@@ -15,47 +15,39 @@ interface RatingByKeyRowProps {
     index: number,
 }
 
-class RatingRangeWithDeltas implements RatingRange {
-    level: number;
-    target: number;
-    plus2: number;
-    plus3: number;
-    fail: number;
+interface RatingThresholdLadderProps {
+    ratingRange: RatingRange;
+    scaleMax: number;
+}
 
-    constructor(ratingRange: RatingRange) {
-        this.level = ratingRange.level;
+function RatingThresholdLadder({ratingRange, scaleMax}: RatingThresholdLadderProps) {
+    const thresholds = [
+        {label: "+3", value: ratingRange.plus3, className: "ratingThresholdBar--plus3"},
+        {label: "+2", value: ratingRange.plus2, className: "ratingThresholdBar--plus2"},
+        {label: "Target", value: ratingRange.target, className: "ratingThresholdBar--target"},
+        {label: "Fail", value: ratingRange.fail, className: "ratingThresholdBar--fail"},
+    ];
+    const valueLabel = thresholds
+        .map(({label, value}) => `${label}: ${value.toFixed(1)}`)
+        .join(", ");
 
-        //const oldRating = calculateTotalRating(playerScore, alternateScore);
-
-        this.fail = ratingRange.fail;
-        this.target = ratingRange.target;
-        this.plus2 = ratingRange.plus2;
-        this.plus3 = ratingRange.plus3;
-    }
-
-    get targetRange(): number[] {
-        return [this.fail, this.target];
-    }
-
-    get targetDelta(): number {
-        return (this.target - this.fail);
-    }
-
-    get plus2Range(): number[] {
-        return [this.target, this.plus2];
-    }
-
-    get plus2Delta(): number {
-        return (this.plus2 - this.target);
-    }
-
-    get plus3Range(): number[] {
-        return [this.plus2, this.plus3];
-    }
-
-    get plus3Delta(): number {
-        return (this.plus3 - this.plus2);
-    }
+    return (
+        <div
+            className="ratingThresholdLadder"
+            role="img"
+            aria-label={`Rating gain at thresholds: ${valueLabel}`}
+            title={valueLabel}
+        >
+            {thresholds.map(({label, value, className}) => (
+                <span className="ratingThresholdBar" key={label}>
+                    <span
+                        className={className}
+                        style={{width: `${(value / scaleMax) * 100}%`}}
+                    />
+                </span>
+            ))}
+        </div>
+    );
 }
 
 function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: RatingByKeyRowProps) {
@@ -70,40 +62,23 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         setExpanded(!expanded);
     }
 
-    const tooltipFormatter: Formatter = (_value, name, item) => {
-        const payload = item.payload as RatingRangeWithDeltas | undefined;
+    const tooltipFormatter: Formatter = (value, name) => {
         const label = name ?? "";
+        const numericValue = Number(value);
 
-        if (payload === undefined) {
-            return [null, label];
-        }
-
-        if (item.dataKey === "targetDelta") {
-            return [payload.fail.toFixed(1) + " - " + payload.target.toFixed(1), label];
-        }
-
-        if (item.dataKey === "plus2Delta") {
-            return [payload.target.toFixed(1) + " - " + payload.plus2.toFixed(1), label];
-        }
-
-        if (item.dataKey === "plus3Delta") {
-            return [payload.plus2.toFixed(1) + " - " + payload.plus3.toFixed(1), label];
-        }
-
-        return [null, label];
+        return [Number.isFinite(numericValue) ? numericValue.toFixed(1) : null, label];
     }
 
-    const levelData: RatingRangeWithDeltas[] = [...Array(highestKey-lowestKey+1)].map(((_,lix) => {
+    const levelData: RatingRange[] = [...Array(highestKey-lowestKey+1)].map(((_,lix) => {
         const mLevel = lowestKey+lix;
-        const x = getDisplayedRatingRange(playerData, parTimer, mLevel);
-
-        return new RatingRangeWithDeltas(x)
+        return getDisplayedRatingRange(playerData, parTimer, mLevel);
     }))
+    const maximumRatingGain = Math.max(...levelData.map((ratingRange) => ratingRange.plus3), 1);
 
     return (
     <>
     <tr className={index % 2 === 0 ? 'even' : 'odd'}>
-        <td>{dungeon.name}</td>
+        <td className="dungeonCell">{dungeon.name}</td>
 
         <td className="level">{playerData.bestRun?.level}</td>
         <td className="score">{playerData.bestRun?.score.toFixed(1)}</td>
@@ -112,7 +87,14 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         </td>
 
         {levelData.map(((lData,lix) => (
-                <td className={lix % 2 === 0 ? 'evenCol' : 'oddCol'} key={lData.level}>{lData.target === 0.0 ? "" : Math.round(lData.target)}</td>
+                <td className={"ratingKeyCell " + (lix % 2 === 0 ? 'evenCol' : 'oddCol')} key={lData.level}>
+                    <div className="ratingCell">
+                        <span className={lData.target === 0 ? "ratingCellValue ratingCellValue--zero" : "ratingCellValue"}>
+                            {Math.round(lData.target)}
+                        </span>
+                        <RatingThresholdLadder ratingRange={lData} scaleMax={maximumRatingGain} />
+                    </div>
+                </td>
             )
         ))}
 
@@ -123,7 +105,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
             <td colSpan={2}>&nbsp;</td>
             <td colSpan={highestKey-lowestKey+3} height="300">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart 
+                    <LineChart
                         data={levelData}
                         margin={{top: 0, right: 0, left: 0, bottom: 0}}>
                         <XAxis dataKey="level" />
@@ -135,11 +117,11 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
                          />
                         <Legend align="center" />
 
-                        <Bar dataKey="fail" name="Minimum" stackId="1" fill="#222222" legendType="none" activeBar={false} />
-                        <Bar dataKey="targetDelta" name="Failed" stackId="1" fill="#AC1F39" activeBar={false} />
-                        <Bar dataKey="plus2Delta" name="Timed" stackId="1" fill="#FFC84A" activeBar={false} />
-                        <Bar dataKey="plus3Delta" name="+2" stackId="1" fill="#4ec04e" activeBar={false} />
-                    </BarChart>
+                        <Line dataKey="plus3" name="+3" stroke="#2090c0" dot={false} strokeWidth={2} />
+                        <Line dataKey="plus2" name="+2" stroke="#4ec04e" dot={false} strokeWidth={2} />
+                        <Line dataKey="target" name="Target" stroke="#FFFFFF" dot={false} strokeWidth={2} />
+                        <Line dataKey="fail" name="Fail" stroke="#FFC84A" dot={false} strokeWidth={2} />
+                    </LineChart>
                 </ResponsiveContainer>
             </td>
         </tr>

@@ -1,0 +1,83 @@
+.recentCharactersPanel {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 0;
+    padding: 16px;
+}
+
+.recentCharactersPanel h2 {
+    font-size: 1rem;
+    line-height: 1.2;
+    margin: 3px 0 0;
+}
+
+.recentCount {
+    color: var(--muted-text);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.recentCharacterList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+}
+
+.recentCharacterLink {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: inherit;
+    display: flex;
+    gap: 8px;
+    min-height: 40px;
+    padding: 7px 9px;
+    text-decoration: none;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.recentCharacterLink:hover,
+.recentCharacterLink:focus-visible {
+    background-color: var(--surface-highlight);
+    border-color: var(--border);
+    outline: none;
+}
+
+.recentCharacterItem.isSelected .recentCharacterLink {
+    background-color: rgba(32, 144, 192, 0.12);
+    border-color: var(--accent);
+}
+
+.recentCharacterName {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.recentCharacterLocation {
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.recentCharacterArrow {
+    color: var(--muted-text);
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.emptyRecentCharacters {
+    color: var(--muted-text);
+    font-size: 0.82rem;
+    margin: 14px 0 0;
+}
+
+@media (max-width: 600px) {
+    .recentCharactersPanel {
+        padding: 12px;
+    }
+}

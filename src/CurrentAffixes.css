@@ -1,16 +1,74 @@
-div.affixBox {
-    display: flex;
-    line-height: 32px;
-    vertical-align: middle;
-    padding: 5px;
+.affixBox {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
 }
 
-ul {
-    display: flex;
-    margin: 0;
+.affixBox--status p {
+    color: var(--muted-text);
+    margin: 10px 0 0;
 }
 
-li {
-    list-style-type: none;
-    margin-right: 5px;
+.affixBox h2 {
+    font-size: 1rem;
+    line-height: 1.2;
+    margin: 3px 0 0;
+}
+
+.affixCount {
+    color: var(--muted-text);
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.affixList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+}
+
+.affixLink {
+    align-items: center;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    display: flex;
+    gap: 8px;
+    min-height: 52px;
+    padding: 5px 10px 5px 5px;
+    text-decoration: none;
+    transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.affixLink:hover,
+.affixLink:focus-visible {
+    background-color: var(--surface-highlight);
+    border-color: var(--accent);
+    outline: none;
+}
+
+.affixIcon {
+    border: 1px solid #111111;
+    border-radius: 5px;
+    display: block;
+}
+
+.affixName {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .affixBox {
+        padding: 12px;
+    }
+
+    .affixLink {
+        min-height: 48px;
+    }
 }

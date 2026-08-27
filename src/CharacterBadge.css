@@ -1,24 +1,97 @@
-div.characterPanel {
+.characterPanel {
+    align-items: center;
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     display: flex;
-    margin-left: 150px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px 14px;
 }
 
-div.verticalFlex {
+.characterThumbnail {
+    flex: 0 0 auto;
+}
+
+.characterThumbnail img {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: block;
+    height: 56px;
+    object-fit: cover;
+    width: 56px;
+}
+
+.characterIdentity {
+    min-width: 0;
+}
+
+.characterEyebrow {
+    color: var(--muted-text);
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.characterName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+.characterRatingRow {
+    align-items: baseline;
     display: flex;
-    flex-direction: column;
+    gap: 7px;
+    margin-top: 4px;
 }
 
-div.characterThumbnail {
-    margin-right: 10px;
+.characterRatingLabel {
+    color: var(--muted-text);
+    font-size: 0.75rem;
 }
 
-div.characterName {
-    font-size: x-large;
+.characterRating {
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
 }
 
-div.characterRating {
-    font-size: large;
-    padding-bottom: 5px;
+.profileLink {
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    display: inline-flex;
+    font-size: 0.75rem;
+    gap: 6px;
+    margin-left: auto;
+    padding: 6px 9px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.profileLink:hover,
+.profileLink:focus-visible {
+    background-color: var(--surface-highlight);
+    border-color: var(--accent);
+    outline: none;
+}
+
+.profileLink img {
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .characterPanel {
+        padding: 10px;
+    }
+
+    .profileLink {
+        font-size: 0;
+        padding: 7px;
+    }
 }

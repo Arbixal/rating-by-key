@@ -1,33 +1,77 @@
-body {
-  background-color: #282c34;
-  color: white;
-}
-
 .App-header {
-  font-size: calc(10px + 2vmin);
-  padding: 5px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px;
 }
 
-.player-name {
-  text-transform: capitalize;
-  cursor: pointer;
-}
-
-.player-name > a {
-  text-decoration: none;
-}
-
-.player-name:hover {
-  text-decoration: underline;
-}
-
-.topArea {
+.appHeaderContent {
+  align-items: center;
   display: flex;
-  
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 1900px;
 }
 
-.recent-list {
-  margin-left: 20px;
+.appHeaderAccent {
+  background-color: var(--accent);
+  border-radius: 3px;
+  display: block;
+  height: 44px;
+  width: 4px;
+}
+
+.appHeaderContent h1 {
+  font-size: 1.6rem;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.appHeaderContent p {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+  margin: 5px 0 0;
+}
+
+.appMain {
+  margin: 0 auto;
+  max-width: 1900px;
+  padding: 16px 20px 32px;
+}
+
+.ratingSection {
+  margin-top: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.loadingPanel {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted-text);
+  padding: 16px;
+}
+
+.panelHeading {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.panelEyebrow {
+  color: var(--accent);
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.panelHeading h2 {
+  font-size: 1rem;
+  line-height: 1.2;
+  margin: 3px 0 0;
 }
 
 .App-link {

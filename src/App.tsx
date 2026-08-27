@@ -20,21 +20,31 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        Rating by Key
+        <div className="appHeaderContent">
+          <span className="appHeaderAccent" aria-hidden="true"></span>
+          <div>
+            <h1>Rating by Key</h1>
+            <p>Mythic+ rating analysis</p>
+          </div>
+        </div>
       </header>
-      <CurrentAffixes />
-      <CharacterSelector
-        key={`${region ?? 'us'}/${realm ?? ''}/${character ?? ''}`}
-        onDataChange={onRunDataChange}
-        region={region ?? 'us'}
-        realm={realm ?? ''}
-        character={character ?? ''}
-      />
-      {runData !== null && characterRating !== null && (
-        <Suspense fallback={<div>Loading ratings...</div>}>
-          <RatingByKey runData={runData} characterRating={characterRating} />
-        </Suspense>
-      )}
+      <main className="appMain">
+        <CurrentAffixes />
+        <CharacterSelector
+          key={`${region ?? 'us'}/${realm ?? ''}/${character ?? ''}`}
+          onDataChange={onRunDataChange}
+          region={region ?? 'us'}
+          realm={realm ?? ''}
+          character={character ?? ''}
+        />
+        {runData !== null && characterRating !== null && (
+          <section className="ratingSection" aria-label="Rating by key projections">
+            <Suspense fallback={<div className="loadingPanel">Loading ratings...</div>}>
+              <RatingByKey runData={runData} characterRating={characterRating} />
+            </Suspense>
+          </section>
+        )}
+      </main>
     </div>
   );
 }

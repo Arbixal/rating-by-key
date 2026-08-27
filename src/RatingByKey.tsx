@@ -254,12 +254,12 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
     }
 
     return (
-        <table>
+        <table className="ratingTable">
             <thead>
                 <tr>
-                    <th rowSpan={2}>Dungeon</th>
-                    <th colSpan={3}>Best Run</th>
-                    <th colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
+                    <th className="dungeonHeader" rowSpan={2}>Dungeon</th>
+                    <th className="bestRunHeader" colSpan={3}>Best Run</th>
+                    <th className="ratingGroupHeader" colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
                     {/* Best Run */}
@@ -269,11 +269,11 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
 
                     {/* Keys */}
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
-                        return (<th key={(lowestKey+ix).toString() + "_header"} className={"key_rating " + (ix % 2 === 0 ? 'evenCol' : 'oddCol')}>+{(lowestKey+ix).toString()}</th>)
+                        return (<th key={(lowestKey+ix).toString() + "_header"} className={"key_rating ratingKeyHeader " + (ix % 2 === 0 ? 'evenCol' : 'oddCol')}>+{(lowestKey+ix).toString()}</th>)
                     })}
 
                     {/* Expanda */
-                    <th></th>}
+                    <th className="expandHeader"></th>}
                 </tr>
             </thead>
             <tbody>
@@ -290,14 +290,14 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colSpan={4}>Projected Total</td>
+                    <td className="projectedTotalCell" colSpan={4}>Projected Total</td>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
                         const total = columnTotals?.[ix];
 
                         return (
                             <td
                                 key={(lowestKey+ix).toString() + "_footer"}
-                                className={ix % 2 === 0 ? 'evenCol' : 'oddCol'}
+                                className={"ratingKeyCell " + (ix % 2 === 0 ? 'evenCol' : 'oddCol')}
                             >
                                 {total === undefined ? "-" : Math.round(total)}
                             </td>
