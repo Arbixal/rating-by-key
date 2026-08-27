@@ -388,7 +388,7 @@ export interface RaiderIORun {
 }
 
 interface CharacterSelectorProps {
-    onDataChange: (data: RaiderIORun[] | null) => void;
+    onDataChange: (data: RaiderIORun[] | null, rating: number | null) => void;
     region: string;
     realm: string;
     character: string;
@@ -410,7 +410,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         }
 
         setCharacterDetails(null);
-        onDataChange(null);
+        onDataChange(null, null);
 
         navigate(`/${regionState}/${realmState}/${characterState}`);
     }
@@ -419,7 +419,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         e.preventDefault();
 
         setCharacterDetails(null);
-        onDataChange(null);
+        onDataChange(null, null);
         
         navigate(`/${regionState}/${realmState}/${characterState}`);
     }
@@ -443,7 +443,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                 if (result.statusCode && result.statusCode !== 200) {
                     setError(new Error(result?.message ?? "An error occurred."));
                     setCharacterDetails(null);
-                    onDataChange(null);
+                    onDataChange(null, null);
                     return;
                 }
 
@@ -462,7 +462,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     rating_color: rating_color,
                 });
                 setError(null);
-                onDataChange([...result.mythic_plus_best_runs]);
+                onDataChange([...result.mythic_plus_best_runs], rating);
                 setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
             })
             .catch(error => {
@@ -472,7 +472,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
 
                 setError(error);
                 setCharacterDetails(null);
-                onDataChange(null);
+                onDataChange(null, null);
             });
     }, [onDataChange]);
 

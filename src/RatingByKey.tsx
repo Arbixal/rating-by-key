@@ -109,24 +109,27 @@ interface RaiderIOSeason {
 
 interface RatingByKeyProps {
     runData: RaiderIORun[] | null,
+    characterRating: number,
 }
 
 const CURRENT_EXPANSION = 11;
+const MINIMUM_KEY = 2;
 const DEFAULT_HIGHEST_KEY = 12;
+const MIN_DISPLAYED_KEY_COLUMNS = 5;
 const MAX_DISPLAYED_KEY_COLUMNS = 11;
 
-function RatingByKey ({runData}: RatingByKeyProps) {
+function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
 
     const [error, setError] = useState<Error | null>(null);
     const [dungeons, setDungeons] = useState<RaiderIODungeon[] | null>(null);
     const { tableData, lowestKey, highestKey } = useMemo(() => {
         const data: {[index: number]: TableData} = {};
-        let lowestKeyWithRating = 99;
+        let lowestKeyWithRating = Number.POSITIVE_INFINITY;
         const highestKeyCompleted = runData?.reduce(
             (highest, run) => Math.max(highest, run.mythic_level),
             0,
         ) ?? 0;
-        const highestKeyToDisplay = Math.max(DEFAULT_HIGHEST_KEY, highestKeyCompleted + 2);
+        const defaultHighestKey = Math.max(DEFAULT_HIGHEST_KEY, highestKeyCompleted + 2);
 
         runData?.forEach((run) => {
             const zone_id = run.zone_id;
@@ -144,10 +147,10 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             dataRow.bestRun.timer = run.clear_time_ms;
             dataRow.bestRun.score = run.score;
 
-            for (let level = 2; level <= highestKeyToDisplay; ++level) {
+            for (let level = MINIMUM_KEY; level <= defaultHighestKey; ++level) {
                 const scoreLevels = getScoreLevels(run.par_time_ms, level, run.score);
 
-                if (scoreLevels.target === 0)
+                if (scoreLevels.target === 0 && scoreLevels.plus2 === 0 && scoreLevels.plus3 === 0)
                     continue;
 
                 dataRow.levels[level] = scoreLevels;
@@ -158,8 +161,15 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             }
         });
 
-        const firstKeyWithRating = lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating;
+        const firstKeyWithRating = Number.isFinite(lowestKeyWithRating)
+            ? lowestKeyWithRating
+            : MINIMUM_KEY;
+        const highestKeyToDisplay = Math.max(
+            defaultHighestKey,
+            firstKeyWithRating + MIN_DISPLAYED_KEY_COLUMNS - 1,
+        );
         const lowestDisplayedKey = Math.max(
+            MINIMUM_KEY,
             firstKeyWithRating,
             highestKeyToDisplay - MAX_DISPLAYED_KEY_COLUMNS + 1,
         );
@@ -189,8 +199,8 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             }
         });
 
-        return totals;
-    }, [dungeons, tableData, lowestKey, highestKey]);
+        return totals.map((total) => total + characterRating);
+    }, [dungeons, tableData, lowestKey, highestKey, characterRating]);
 
     useEffect(() => {
         if (runData == null) {
@@ -287,7 +297,7 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colSpan={8}>Total</td>
+                    <td colSpan={8}>Projected Total</td>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
                         const total = columnTotals?.[ix];
 

@@ -10,10 +10,12 @@ function App() {
 
   const {region, realm, character} = useParams();
   const [runData, setRunData] = useState<RaiderIORun[] | null>(null);
+  const [characterRating, setCharacterRating] = useState<number | null>(null);
   
-  const onRunDataChange = useCallback((data: RaiderIORun[] | null) => {
+  const onRunDataChange = useCallback((data: RaiderIORun[] | null, rating: number | null) => {
     setRunData(data);
-  }, [setRunData]);
+    setCharacterRating(rating);
+  }, [setRunData, setCharacterRating]);
 
   return (
     <div className="App">
@@ -28,9 +30,9 @@ function App() {
         realm={realm ?? ''}
         character={character ?? ''}
       />
-      {runData !== null && (
+      {runData !== null && characterRating !== null && (
         <Suspense fallback={<div>Loading ratings...</div>}>
-          <RatingByKey runData={runData} />
+          <RatingByKey runData={runData} characterRating={characterRating} />
         </Suspense>
       )}
     </div>

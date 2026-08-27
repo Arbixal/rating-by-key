@@ -54,7 +54,7 @@ describe('route-driven character loading', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toContain('region=us');
     expect(fetchMock.mock.calls[0][1]).toEqual({ signal: expect.any(AbortSignal) });
-    expect(onDataChange).toHaveBeenCalledWith([]);
+    expect(onDataChange).toHaveBeenCalledWith([], 837);
   });
 });
 
@@ -112,25 +112,80 @@ describe('rating data derivation', () => {
     });
 
     vi.stubGlobal('fetch', fetchMock);
-    render(<RatingByKey runData={runData} />);
+    render(<RatingByKey runData={runData} characterRating={837} />);
 
     await waitFor(() => expect(screen.getByText('Altar of Fangs')).toBeInTheDocument());
 
     expect(screen.getByRole('columnheader', { name: 'Rating gained by running' }))
-      .toHaveAttribute('colspan', '3');
+      .toHaveAttribute('colspan', '5');
 
     const footerCells = Array.from(screen.getByRole('table').querySelectorAll('tfoot td'));
 
-    expect(footerCells).toHaveLength(5);
-    expect(footerCells[0]).toHaveTextContent('Total');
+    expect(footerCells).toHaveLength(7);
+    expect(footerCells[0]).toHaveTextContent('Projected Total');
     expect(footerCells.slice(1, -1).map((cell) => cell.textContent?.trim())).toEqual([
-      '336',
-      '366',
-      '396',
+      '1127',
+      '1173',
+      '1203',
+      '1233',
+      '1263',
     ]);
   });
 
-  test('keeps the highest completed key plus two levels within the column limit', async () => {
+  test('shows the full display window when lower levels have no remaining rating', async () => {
+    const runData: RaiderIORun[] = [
+      {
+        dungeon: 'Altar of Fangs',
+        short_name: 'AOF',
+        mythic_level: 12,
+        completed_at: new Date().toISOString(),
+        clear_time_ms: 1_856_494,
+        par_time_ms: 1_800_999,
+        num_keystone_upgrades: 0,
+        map_challenge_mode_id: 588,
+        zone_id: 16865,
+        url: 'https://raider.io/mythic-plus-runs/example',
+        affixes: [],
+        score: 365.6,
+      },
+    ];
+    const staticData = {
+      seasons: [
+        {
+          is_main_season: true,
+          starts: { us: '2026-01-01T00:00:00Z' },
+          ends: { us: '2030-01-01T00:00:00Z' },
+          dungeons: [
+            {
+              id: 16865,
+              challenge_mode_id: 588,
+              slug: 'altar-of-fangs',
+              name: 'Altar of Fangs',
+              short_name: 'AOF',
+              keystone_timer_seconds: 1800,
+              icon_url: 'https://example.com/icon.jpg',
+              background_image_url: 'https://example.com/background.jpg',
+            },
+          ],
+        },
+      ],
+    };
+    const fetchMock = vi.fn().mockResolvedValue({
+      json: async () => staticData,
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+    render(<RatingByKey runData={runData} characterRating={0} />);
+
+    await waitFor(() => expect(screen.getByText('Altar of Fangs')).toBeInTheDocument());
+
+    expect(screen.getByRole('columnheader', { name: 'Rating gained by running' }))
+      .toHaveAttribute('colspan', '5');
+    expect(screen.getByRole('columnheader', { name: '+13' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: '+17' })).toBeInTheDocument();
+  });
+
+  test('caps a wide display range at eleven columns', async () => {
     const runData: RaiderIORun[] = [
       {
         dungeon: 'Altar of Fangs',
@@ -173,7 +228,7 @@ describe('rating data derivation', () => {
     });
 
     vi.stubGlobal('fetch', fetchMock);
-    render(<RatingByKey runData={runData} />);
+    render(<RatingByKey runData={runData} characterRating={0} />);
 
     await waitFor(() => expect(screen.getByText('Altar of Fangs')).toBeInTheDocument());
 
@@ -203,13 +258,15 @@ describe('rating data derivation', () => {
     const fetchMock = vi.fn().mockImplementation(() => new Promise(() => {}));
 
     vi.stubGlobal('fetch', fetchMock);
-    render(<RatingByKey runData={runData} />);
+    render(<RatingByKey runData={runData} characterRating={0} />);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     const footerCells = Array.from(screen.getByRole('table').querySelectorAll('tfoot td'));
 
     expect(footerCells.slice(1, -1).map((cell) => cell.textContent?.trim())).toEqual([
+      '-',
+      '-',
       '-',
       '-',
       '-',
@@ -236,7 +293,7 @@ describe('rating data derivation', () => {
     const fetchMock = vi.fn().mockImplementation(() => new Promise(() => {}));
 
     vi.stubGlobal('fetch', fetchMock);
-    const { unmount } = render(<RatingByKey runData={runData} />);
+    const { unmount } = render(<RatingByKey runData={runData} characterRating={0} />);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
