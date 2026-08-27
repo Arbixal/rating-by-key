@@ -139,7 +139,7 @@ export class TableData {
     levels: {[index: number] : RatingRange} = {};
 }
 
-const CURRENT_EXPANSION = 10;
+const CURRENT_EXPANSION = 11;
 const MAX_KEY = 15;
 
 function getScore(par: number, timer: number, level: number) {
@@ -284,7 +284,7 @@ function RatingByKey ({runData}: RatingByKeyProps) {
                 <tr>
                     <th rowSpan={2}>Dungeon</th>
                     <th colSpan={4}>Timers</th>
-                    <th colSpan={4}>Best Run</th>
+                    <th colSpan={3}>Best Run</th>
                     <th colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
@@ -320,6 +320,14 @@ function RatingByKey ({runData}: RatingByKeyProps) {
                     />
                 ))}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colSpan={8}>&nbsp;</td>
+                    {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
+                        return (<td key={(lowestKey+ix).toString() + "_footer"}> - </td>)
+                    })}
+                </tr>
+            </tfoot>
         </table>
     )
 }
