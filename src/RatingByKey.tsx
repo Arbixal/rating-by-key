@@ -102,8 +102,8 @@ interface RaiderIOSeason {
     is_main_season: boolean,
     short_name: string,
     seasonal_affix: string | null,
-    starts: { us: Date, eu: Date, tw: Date, kr: Date, cn: Date },
-    ends: { us: Date | null, eu: Date | null, tw: Date | null, kr: Date | null, cn: Date | null },
+    starts: { us: string, eu: string, tw: string, kr: string, cn: string },
+    ends: { us: string | null, eu: string | null, tw: string | null, kr: string | null, cn: string | null },
     dungeons: RaiderIODungeon[],
 }
 

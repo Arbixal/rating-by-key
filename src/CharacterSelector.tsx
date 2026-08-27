@@ -376,7 +376,7 @@ export interface RaiderIORun {
     dungeon: string,
     short_name: string,
     mythic_level: number,
-    completed_at: Date,
+    completed_at: string,
     clear_time_ms: number,
     par_time_ms: number,
     num_keystone_upgrades: number,
