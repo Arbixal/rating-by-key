@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 export type CharacterInput = {
@@ -21,11 +21,12 @@ interface RecentCharactersProps {
 }
 
 function characterEquals(compare1: CharacterInput, compare2: CharacterInput) {
-    return compare1.name === compare2.name && compare1.realm === compare2.realm && compare1.region && compare2.region;
+    return compare1.name === compare2.name
+        && compare1.realm === compare2.realm
+        && compare1.region === compare2.region;
 }
 
 function RecentCharacters({selectedCharacter}: RecentCharactersProps) {
-    const [character, setCharacter] = useState<CharacterInput | undefined>();
     const [recents, setRecents] = useState(() => {
         const saved: string | null = localStorage.getItem("characters");
         const initialValue = JSON.parse(saved ?? "[]");
@@ -36,36 +37,43 @@ function RecentCharacters({selectedCharacter}: RecentCharactersProps) {
 
         return [];
     });
+    const processedCharacter = useRef<string | null>(null);
 
-    useMemo(() => {
-        // Check if the selected character is not set
+    useEffect(() => {
         if (selectedCharacter == null) {
             return;
         }
 
-        // Check if the most recent character is the same as the current character
-        if (character !== undefined && characterEquals(selectedCharacter, character)) {
+        const characterKey = JSON.stringify([
+            selectedCharacter.region,
+            selectedCharacter.realm,
+            selectedCharacter.name,
+        ]);
+
+        if (processedCharacter.current === characterKey) {
             return;
         }
 
-        setCharacter(selectedCharacter);
+        processedCharacter.current = characterKey;
+        const lastAccessed = Date.now() / 1000;
 
-        const existingCharacter = recents.find(x => characterEquals(x, selectedCharacter));
-        if (existingCharacter !== undefined) {
-            existingCharacter.lastAccessed = (new Date()).getTime() / 1000;
-        } else {
-            selectedCharacter.lastAccessed = (new Date()).getTime() / 1000;
-            recents.unshift(selectedCharacter);
-        }
+        setRecents((previous) => {
+            const existingCharacter = previous.find((item) => characterEquals(item, selectedCharacter));
+            const withoutExisting = previous.filter((item) => !characterEquals(item, selectedCharacter));
+            const updatedCharacter = {
+                ...(existingCharacter ?? selectedCharacter),
+                lastAccessed,
+            };
 
-        const newArray = recents
-                        .toSorted((a,b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))
-                        .slice(0, 5);
+            return [updatedCharacter, ...withoutExisting]
+                .toSorted((a,b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))
+                .slice(0, 5);
+        });
+    }, [selectedCharacter]);
 
-        localStorage.setItem("characters", JSON.stringify(newArray))
-        setRecents(newArray);
-
-    }, [selectedCharacter, character, recents])
+    useEffect(() => {
+        localStorage.setItem("characters", JSON.stringify(recents));
+    }, [recents]);
 
     return (
         <div className="topArea">

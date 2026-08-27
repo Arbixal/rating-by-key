@@ -320,7 +320,7 @@
 }
 */
 
-import { KeyboardEvent, MouseEvent, useCallback, useMemo, useState } from "react";
+import { KeyboardEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
 import { Affix } from "./CurrentAffixes";
@@ -424,7 +424,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         navigate(`/${regionState}/${realmState}/${characterState}`);
     }
 
-    const fetchCharacterData = useCallback((regionLocal: string, realmLocal: string | undefined, characterLocal: string | undefined) => {
+    const fetchCharacterData = useCallback((regionLocal: string, realmLocal: string | undefined, characterLocal: string | undefined, signal: AbortSignal) => {
         console.log(`Loading ${regionLocal}/${realmLocal}/${characterLocal}`)
         if (!characterLocal || !regionLocal || !realmLocal) {
             return;
@@ -433,9 +433,13 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         fetch("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase() 
             + "&realm=" + realmLocal.toLowerCase() 
             + "&name=" + characterLocal.toLowerCase() 
-            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs")
-            .then(resp =>  resp.json())
+            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs", {signal})
+            .then(resp => resp.json())
             .then((result: RaiderIOCharacter) => {
+                if (signal.aborted) {
+                    return;
+                }
+
                 if (result.statusCode && result.statusCode !== 200) {
                     setError(new Error(result?.message ?? "An error occurred."));
                     setCharacterDetails(null);
@@ -460,23 +464,32 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                 setError(null);
                 onDataChange([...result.mythic_plus_best_runs]);
                 setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
-            },
-            (error) => {
+            })
+            .catch(error => {
+                if (signal.aborted) {
+                    return;
+                }
+
                 setError(error);
                 setCharacterDetails(null);
                 onDataChange(null);
-            })
-            .catch(err => setError(err))
+            });
     }, [onDataChange]);
 
-    useMemo(() => {
-      if (region !== '' && realm !== '' && character !== '') {
-        console.log(`Region: ${region}, Realm: ${realm}, Character: ${character}`);
-        setCharacter(character);
-        setRegion(region);
-        setRealm(realm);
-        fetchCharacterData(region, realm, character);
+    useEffect(() => {
+      if (region === '' || realm === '' || character === '') {
+        return;
       }
+
+      const controller = new AbortController();
+
+      console.log(`Region: ${region}, Realm: ${realm}, Character: ${character}`);
+      setCharacter(character);
+      setRegion(region);
+      setRealm(realm);
+      fetchCharacterData(region, realm, character, controller.signal);
+
+      return () => controller.abort();
     }, [region, realm, character, fetchCharacterData]);
 
     return (

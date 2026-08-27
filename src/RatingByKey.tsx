@@ -118,9 +118,7 @@ function RatingByKey ({runData}: RatingByKeyProps) {
 
     const [error, setError] = useState<Error | null>(null);
     const [dungeons, setDungeons] = useState<RaiderIODungeon[] | null>(null);
-    const [lowestKey, setLowestKey] = useState<number>(2);
-    const [highestKey, setHighestKey] = useState<number>(MAX_KEY);
-    const tableData: {[index: number]: TableData} = useMemo(() => {
+    const { tableData, lowestKey, highestKey } = useMemo(() => {
         const data: {[index: number]: TableData} = {};
         let lowestKeyWithRating = 99;
         let highestKeyCompleted = 0;
@@ -159,10 +157,11 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             }
         });
 
-        setLowestKey(lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating);
-        setHighestKey(Math.min(MAX_KEY, Math.max(20, highestKeyCompleted + 10)))
-
-        return data;
+        return {
+            tableData: data,
+            lowestKey: lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating,
+            highestKey: Math.min(MAX_KEY, Math.max(20, highestKeyCompleted + 10)),
+        };
     }, [runData]);
 
     useEffect(() => {
