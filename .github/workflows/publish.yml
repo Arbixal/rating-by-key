@@ -14,8 +14,10 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        # Vite 8 / Vitest 4 require Node >=20.19 (or >=22.12); using the current
+        # Active LTS line.
 
     steps:
     - uses: actions/checkout@v4
