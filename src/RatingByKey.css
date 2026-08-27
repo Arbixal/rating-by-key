@@ -38,11 +38,13 @@ tr.even td.tyrannical {
 
 .evenCol {
     background-color: #444444;
-    width: 40px;
+    width: 45px;
+    padding-right: 5px;
 }
 
 .oddCol {
-    width: 40px;
+    width: 45px;
+    padding-right: 5px;
 }
 
 tr.even > td.evenCol {

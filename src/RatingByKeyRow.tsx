@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getScoreLevels, TableData } from "./ratingData";
+import { getDisplayedRatingRange, TableData } from "./ratingData";
 import type { RaiderIODungeon, RatingRange } from "./ratingData";
 import { formatTime } from "./utils";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
@@ -98,7 +98,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
 
     const levelData: RatingRangeWithDeltas[] = [...Array(highestKey-lowestKey+1)].map(((_,lix) => {
         const mLevel = lowestKey+lix;
-        const x = playerData.levels[mLevel] ?? getScoreLevels(parTimer, mLevel, playerData.bestRun.score);
+        const x = getDisplayedRatingRange(playerData, parTimer, mLevel);
 
         return new RatingRangeWithDeltas(x)
     }))
@@ -118,7 +118,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         <td className="score">{playerData.bestRun?.score.toFixed(1)}</td>
 
         {levelData.map(((lData,lix) => (
-                <td className={lix % 2 === 0 ? 'evenCol' : 'oddCol'} key={lData.level}>{lData.target === 0.0 ? "" : (lData.target).toFixed(1)}</td>
+                <td className={lix % 2 === 0 ? 'evenCol' : 'oddCol'} key={lData.level}>{lData.target === 0.0 ? "" : Math.round(lData.target)}</td>
             )
         ))}
 

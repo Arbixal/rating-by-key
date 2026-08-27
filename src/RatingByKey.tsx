@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
 import RatingByKeyRow from "./RatingByKeyRow";
-import { getScoreLevels, TableData } from "./ratingData";
+import { getDisplayedRatingRange, getScoreLevels, TableData } from "./ratingData";
 import type { RaiderIODungeon } from "./ratingData";
 
 // https://raider.io/api/v1/mythic-plus/static-data?expansion_id=9
@@ -112,7 +112,8 @@ interface RatingByKeyProps {
 }
 
 const CURRENT_EXPANSION = 11;
-const MAX_KEY = 15;
+const DEFAULT_HIGHEST_KEY = 12;
+const MAX_DISPLAYED_KEY_COLUMNS = 11;
 
 function RatingByKey ({runData}: RatingByKeyProps) {
 
@@ -121,7 +122,11 @@ function RatingByKey ({runData}: RatingByKeyProps) {
     const { tableData, lowestKey, highestKey } = useMemo(() => {
         const data: {[index: number]: TableData} = {};
         let lowestKeyWithRating = 99;
-        let highestKeyCompleted = 0;
+        const highestKeyCompleted = runData?.reduce(
+            (highest, run) => Math.max(highest, run.mythic_level),
+            0,
+        ) ?? 0;
+        const highestKeyToDisplay = Math.max(DEFAULT_HIGHEST_KEY, highestKeyCompleted + 2);
 
         runData?.forEach((run) => {
             const zone_id = run.zone_id;
@@ -135,15 +140,11 @@ function RatingByKey ({runData}: RatingByKeyProps) {
 
             const dataRow = data[run.zone_id];
 
-            if (run.mythic_level > highestKeyCompleted) {
-                highestKeyCompleted = run.mythic_level;
-            }
-
             dataRow.bestRun.level = run.mythic_level;
             dataRow.bestRun.timer = run.clear_time_ms;
             dataRow.bestRun.score = run.score;
 
-            for (let level = 2; level <= MAX_KEY; ++level) {
+            for (let level = 2; level <= highestKeyToDisplay; ++level) {
                 const scoreLevels = getScoreLevels(run.par_time_ms, level, run.score);
 
                 if (scoreLevels.target === 0)
@@ -157,12 +158,39 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             }
         });
 
+        const firstKeyWithRating = lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating;
+        const lowestDisplayedKey = Math.max(
+            firstKeyWithRating,
+            highestKeyToDisplay - MAX_DISPLAYED_KEY_COLUMNS + 1,
+        );
+
         return {
             tableData: data,
-            lowestKey: lowestKeyWithRating === 99 ? 2 : lowestKeyWithRating,
-            highestKey: Math.min(MAX_KEY, Math.max(20, highestKeyCompleted + 10)),
+            lowestKey: lowestDisplayedKey,
+            highestKey: highestKeyToDisplay,
         };
     }, [runData]);
+
+    const columnTotals = useMemo(() => {
+        if (dungeons == null) {
+            return null;
+        }
+
+        const keyCount = highestKey - lowestKey + 1;
+        const totals = Array.from({length: keyCount}, () => 0);
+
+        dungeons.forEach((dungeon) => {
+            const playerData = tableData[dungeon.id] ?? new TableData();
+            const parTimer = (dungeon.keystone_timer_seconds * 1000) + 999;
+
+            for (let ix = 0; ix < keyCount; ++ix) {
+                const level = lowestKey + ix;
+                totals[ix] += getDisplayedRatingRange(playerData, parTimer, level).target;
+            }
+        });
+
+        return totals;
+    }, [dungeons, tableData, lowestKey, highestKey]);
 
     useEffect(() => {
         if (runData == null) {
@@ -259,10 +287,20 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colSpan={8}>&nbsp;</td>
+                    <td colSpan={8}>Total</td>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
-                        return (<td key={(lowestKey+ix).toString() + "_footer"}> - </td>)
+                        const total = columnTotals?.[ix];
+
+                        return (
+                            <td
+                                key={(lowestKey+ix).toString() + "_footer"}
+                                className={ix % 2 === 0 ? 'evenCol' : 'oddCol'}
+                            >
+                                {total === undefined ? "-" : Math.round(total)}
+                            </td>
+                        )
                     })}
+                    <td aria-hidden="true"></td>
                 </tr>
             </tfoot>
         </table>

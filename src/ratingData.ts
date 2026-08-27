@@ -73,3 +73,7 @@ export function getScoreLevels(par: number, level: number, score: number) {
         fail: Math.max(0,failScore - score)
     };
 }
+
+export function getDisplayedRatingRange(playerData: TableData, par: number, level: number): RatingRange {
+    return playerData.levels[level] ?? getScoreLevels(par, level, playerData.bestRun.score);
+}
