@@ -5,6 +5,7 @@ import { formatTime } from "./utils";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
 import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, XAxis } from "recharts";
+import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
 
 interface RatingByKeyRowProps {
     dungeon: RaiderIODungeon,
@@ -72,20 +73,27 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         setExpanded(!expanded);
     }
 
-    const tooltipFormatter = (value, name, props) => {
-        if (props.dataKey === "targetDelta") {
-            return [props.payload.fail.toFixed(1) + " - " + props.payload.target.toFixed(1), name];
+    const tooltipFormatter: Formatter = (_value, name, item) => {
+        const payload = item.payload as RatingRangeWithDeltas | undefined;
+        const label = name ?? "";
+
+        if (payload === undefined) {
+            return [null, label];
         }
 
-        if (props.dataKey === "plus2Delta") {
-            return [props.payload.target.toFixed(1) + " - " + props.payload.plus2.toFixed(1), name];
+        if (item.dataKey === "targetDelta") {
+            return [payload.fail.toFixed(1) + " - " + payload.target.toFixed(1), label];
         }
 
-        if (props.dataKey === "plus3Delta") {
-            return [props.payload.plus2.toFixed(1) + " - " + props.payload.plus3.toFixed(1), name];
+        if (item.dataKey === "plus2Delta") {
+            return [payload.target.toFixed(1) + " - " + payload.plus2.toFixed(1), label];
         }
 
-        return [null, ""];
+        if (item.dataKey === "plus3Delta") {
+            return [payload.plus2.toFixed(1) + " - " + payload.plus3.toFixed(1), label];
+        }
+
+        return [null, label];
     }
 
     const levelData: RatingRangeWithDeltas[] = [...Array(highestKey-lowestKey+1)].map(((_,lix) => {

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
+import { expect, test } from 'vitest';
 import App from './App';
 
 test('renders the app header', () => {

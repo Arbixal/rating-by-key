@@ -133,16 +133,11 @@ The following checks have passed after the migration and dependency upgrades:
 - `npm run build`
 - `npm audit`
 - `npm audit --omit=dev`
+- `npx tsc --noEmit`
 - Production root and deep-link HTTP checks
 
 The production workflow has also completed successfully on Node 22, including
 the S3 upload and CloudFront invalidation jobs.
-
-`npx tsc --noEmit` is not currently clean. Known issues are missing Vitest
-global types in `src/App.test.tsx`, the untyped Recharts tooltip formatter in
-`src/RatingByKeyRow.tsx`, and the `test` property typing in `vite.config.ts`.
-Do not treat those known issues as evidence that the production build is
-broken.
 
 ## Working Conventions
 
