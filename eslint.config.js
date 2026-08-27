@@ -18,12 +18,8 @@ export default tseslint.config(
       'react-refresh': reactRefresh,
     },
     rules: {
-      // Match the classic CRA (eslint-config-react-app) rule set rather than
-      // the newer react-compiler-derived rules shipped in recent versions of
-      // eslint-plugin-react-hooks, which flag pre-existing patterns unrelated
-      // to this tooling migration.
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      // Use the full modern React Hooks and React Compiler rule set.
+      ...reactHooks.configs.flat.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
@@ -33,4 +29,3 @@ export default tseslint.config(
     },
   },
 );
-

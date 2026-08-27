@@ -21,7 +21,13 @@ function App() {
         Rating by Key
       </header>
       <CurrentAffixes />
-      <CharacterSelector onDataChange={onRunDataChange} region={region ?? 'us'} realm={realm ?? ''} character={character ?? ''} />
+      <CharacterSelector
+        key={`${region ?? 'us'}/${realm ?? ''}/${character ?? ''}`}
+        onDataChange={onRunDataChange}
+        region={region ?? 'us'}
+        realm={realm ?? ''}
+        character={character ?? ''}
+      />
       {runData !== null && (
         <Suspense fallback={<div>Loading ratings...</div>}>
           <RatingByKey runData={runData} />

@@ -484,9 +484,6 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
       const controller = new AbortController();
 
       console.log(`Region: ${region}, Realm: ${realm}, Character: ${character}`);
-      setCharacter(character);
-      setRegion(region);
-      setRealm(realm);
       fetchCharacterData(region, realm, character, controller.signal);
 
       return () => controller.abort();
