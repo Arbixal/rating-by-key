@@ -55,16 +55,28 @@ function CurrentAffixes()
     const [affixes, setAffixes] = useState<Affix[]>([]);
 
     useEffect(() => {
-        fetch("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en")
+        const controller = new AbortController();
+
+        fetch("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en", {signal: controller.signal})
             .then(res => res.json())
             .then((result: AffixesResult) => {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
                 setIsLoaded(true);
                 setAffixes(result.affix_details);
-            },
-            (error) => {
+            })
+            .catch((error) => {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
                 setIsLoaded(true);
                 setError(error);
-            })
+            });
+
+        return () => controller.abort();
     }, [])
 
     if (error) {

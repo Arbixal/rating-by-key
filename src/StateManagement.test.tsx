@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import CharacterSelector from './CharacterSelector';
 import type { RaiderIORun } from './CharacterSelector';
+import CurrentAffixes from './CurrentAffixes';
 import RatingByKey from './RatingByKey';
 import RecentCharacters, { CharacterInput } from './RecentCharacters';
 
@@ -107,6 +108,52 @@ describe('rating data derivation', () => {
 
     expect(screen.getByRole('columnheader', { name: 'Rating gained by running' }))
       .toHaveAttribute('colspan', '6');
+  });
+
+  test('aborts the static data request when unmounted', async () => {
+    const runData: RaiderIORun[] = [
+      {
+        dungeon: 'Altar of Fangs',
+        short_name: 'AOF',
+        mythic_level: 10,
+        completed_at: new Date(),
+        clear_time_ms: 1_856_494,
+        par_time_ms: 1_800_999,
+        num_keystone_upgrades: 0,
+        map_challenge_mode_id: 588,
+        zone_id: 16865,
+        url: 'https://raider.io/mythic-plus-runs/example',
+        affixes: [],
+        score: 303.8,
+      },
+    ];
+    const fetchMock = vi.fn().mockImplementation(() => new Promise(() => {}));
+
+    vi.stubGlobal('fetch', fetchMock);
+    const { unmount } = render(<RatingByKey runData={runData} />);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
+
+    expect(signal.aborted).toBe(false);
+    unmount();
+    expect(signal.aborted).toBe(true);
+  });
+});
+
+describe('current affix request cleanup', () => {
+  test('aborts the affix request when unmounted', async () => {
+    const fetchMock = vi.fn().mockImplementation(() => new Promise(() => {}));
+
+    vi.stubGlobal('fetch', fetchMock);
+    const { unmount } = render(<CurrentAffixes />);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const signal = fetchMock.mock.calls[0][1].signal as AbortSignal;
+
+    expect(signal.aborted).toBe(false);
+    unmount();
+    expect(signal.aborted).toBe(true);
   });
 });
 

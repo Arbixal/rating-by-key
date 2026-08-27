@@ -169,9 +169,15 @@ function RatingByKey ({runData}: RatingByKeyProps) {
             return;
         }
 
-        fetch("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION)
+        const controller = new AbortController();
+
+        fetch("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION, {signal: controller.signal})
             .then(res => res.json())
             .then((result: RaiderIOStaticData) => {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
                 if (result.seasons.length === 0) {
                     return;
                 }
@@ -189,10 +195,16 @@ function RatingByKey ({runData}: RatingByKeyProps) {
                         break;
                     }
                 }
-            },
-            (error) => {
-                setError(error);
             })
+            .catch((error) => {
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setError(error);
+            });
+
+        return () => controller.abort();
     }, [runData])
 
     if (runData == null) {
