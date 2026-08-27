@@ -23,9 +23,25 @@ export interface RatingRange {
     fail: number;
 }
 
+export interface TimerThresholds {
+    plus3: number;
+    plus2: number;
+    target: number;
+    fail: number;
+}
+
 export class TableData {
     bestRun: AffixSummary = { level: null, timer: null, score: 0};
     levels: {[index: number] : RatingRange} = {};
+}
+
+export function getTimerThresholds(par: number): TimerThresholds {
+    return {
+        plus3: par - (par * 0.4),
+        plus2: par - (par * 0.2),
+        target: par,
+        fail: par + (par * 0.4),
+    };
 }
 
 function getScore(par: number, timer: number, level: number) {

@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getDisplayedRatingRange, TableData } from "./ratingData";
+import { getDisplayedRatingRange, getTimerThresholds, TableData } from "./ratingData";
 import type { RaiderIODungeon, RatingRange } from "./ratingData";
-import { formatTime } from "./utils";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
 import { BarChart, Legend, ResponsiveContainer, YAxis, Bar, Tooltip, XAxis } from "recharts";
 import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
+import TimerRuler from "./TimerRuler";
 
 interface RatingByKeyRowProps {
     dungeon: RaiderIODungeon,
@@ -62,10 +62,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
     const [expanded, setExpanded] = useState<boolean>(false);
 
     const parTimer = (dungeon.keystone_timer_seconds * 1000) + 999; //SEASON_3_TIMERS[dungeon.id];
-    const target = new Date(parTimer);
-    const plus2 = new Date(parTimer - (parTimer * 0.2));
-    const plus3 = new Date(parTimer - (parTimer * 0.4));
-    const fail = new Date(parTimer + (parTimer * 0.4));
+    const timerThresholds = getTimerThresholds(parTimer);
 
     const handleExpandClick = (e: MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
@@ -108,14 +105,11 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
     <tr className={index % 2 === 0 ? 'even' : 'odd'}>
         <td>{dungeon.name}</td>
 
-        <td className="timeTarget">{formatTime(target)}</td>
-        <td className="timePlus2">{formatTime(plus2)}</td>
-        <td className="timePlus3">{formatTime(plus3)}</td>
-        <td className="timeFail">{formatTime(fail)}</td>
-
         <td className="level">{playerData.bestRun?.level}</td>
-        <td className="timer">{playerData.bestRun?.timer ? formatTime(new Date(playerData.bestRun.timer)) : null}</td>
         <td className="score">{playerData.bestRun?.score.toFixed(1)}</td>
+        <td className="runProgressCell">
+            <TimerRuler clearTime={playerData.bestRun?.timer ?? null} thresholds={timerThresholds} />
+        </td>
 
         {levelData.map(((lData,lix) => (
                 <td className={lix % 2 === 0 ? 'evenCol' : 'oddCol'} key={lData.level}>{lData.target === 0.0 ? "" : Math.round(lData.target)}</td>
@@ -126,8 +120,8 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
     </tr>
     {expanded && (
         <tr className={index % 2 === 0 ? 'event' : 'odd'}>
-            <td colSpan={7}>&nbsp;</td>
-            <td colSpan={highestKey-lowestKey+2} height="300">
+            <td colSpan={2}>&nbsp;</td>
+            <td colSpan={highestKey-lowestKey+3} height="300">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart 
                         data={levelData}

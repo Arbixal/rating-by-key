@@ -258,21 +258,14 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
             <thead>
                 <tr>
                     <th rowSpan={2}>Dungeon</th>
-                    <th colSpan={4}>Timers</th>
                     <th colSpan={3}>Best Run</th>
                     <th colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
-                    {/* Timers */}
-                    <th>Target</th>
-                    <th>+2</th>
-                    <th>+3</th>
-                    <th>Fail</th>
-
                     {/* Best Run */}
                     <th className="level">Level</th>
-                    <th className="timer">Timer</th>
                     <th className="score">Score</th>
+                    <th className="runProgressHeader">Progress</th>
 
                     {/* Keys */}
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
@@ -297,7 +290,7 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td colSpan={8}>Projected Total</td>
+                    <td colSpan={4}>Projected Total</td>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
                         const total = columnTotals?.[ix];
 

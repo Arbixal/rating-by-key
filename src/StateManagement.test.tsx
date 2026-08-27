@@ -119,6 +119,13 @@ describe('rating data derivation', () => {
     expect(screen.getByRole('columnheader', { name: 'Rating gained by running' }))
       .toHaveAttribute('colspan', '5');
 
+    const bestRunHeaders = Array.from(screen.getByRole('table').querySelectorAll('thead tr:nth-child(2) th'))
+      .slice(0, 3)
+      .map((header) => header.textContent?.trim());
+
+    expect(bestRunHeaders).toEqual(['Level', 'Score', 'Progress']);
+    expect(screen.queryByRole('columnheader', { name: 'Timers' })).not.toBeInTheDocument();
+
     const footerCells = Array.from(screen.getByRole('table').querySelectorAll('tfoot td'));
 
     expect(footerCells).toHaveLength(7);

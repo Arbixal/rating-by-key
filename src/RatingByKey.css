@@ -55,18 +55,166 @@ tr.even > td.evenCol {
     width: 50px;
 }
 
-.timeFail {
-    color: #AC1F39;
+.runProgressCell {
+    min-width: 360px;
+    padding: 4px 8px;
+    text-align: left;
 }
 
-.timePlus3 {
+.runProgressHeader {
+    min-width: 360px;
+}
+
+.runProgress {
+    min-width: 340px;
+}
+
+.runProgressSummary {
+    align-items: baseline;
+    display: flex;
+    gap: 7px;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.runProgressStatus {
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.runProgressStatus--no-run {
+    color: #aaaaaa;
+}
+
+.runProgressStatus--plus3 {
+    color: #2090c0;
+}
+
+.runProgressStatus--plus2 {
     color: #4ec04e;
 }
 
-.timePlus2 {
+.runProgressStatus--timed {
+    color: #FFFFFF;
+}
+
+.runProgressStatus--overtime {
     color: #FFC84A;
 }
 
-.timeTarget {
-    color: #FFFFFF;
+.runProgressStatus--no-score {
+    color: #AC1F39;
+}
+
+.runProgressTime {
+    color: #dddddd;
+    font-size: 0.75rem;
+}
+
+.timerRuler {
+    margin-top: 5px;
+    width: 340px;
+}
+
+.timerRulerTrack {
+    border-radius: 4px;
+    display: flex;
+    height: 17px;
+    overflow: visible;
+    position: relative;
+}
+
+.timerRulerSegment {
+    align-items: center;
+    display: flex;
+    font-size: 0.62rem;
+    font-weight: 700;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.timerRulerSegment:first-child {
+    border-radius: 4px 0 0 4px;
+}
+
+.timerRulerSegment--plus3 {
+    background-color: #2090c0;
+    color: #102010;
+}
+
+.timerRulerSegment--plus2 {
+    background-color: #4ec04e;
+    color: #102010;
+}
+
+.timerRulerSegment--timed {
+    background-color: #dddddd;
+    color: #222222;
+}
+
+.timerRulerSegment--overtime {
+    background-color: #FFC84A;
+    color: #332600;
+    border-radius: 0 4px 4px 0;
+}
+
+.timerRulerTick {
+    background-color: rgba(0, 0, 0, 0.55);
+    height: 23px;
+    position: absolute;
+    top: -3px;
+    width: 1px;
+    z-index: 1;
+}
+
+.timerRulerMarker {
+    background-color: #FFFFFF;
+    border: 1px solid #111111;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65);
+    height: 25px;
+    position: absolute;
+    top: -4px;
+    transform: translateX(-50%);
+    width: 3px;
+    z-index: 2;
+}
+
+.timerRulerMarker--overflow {
+    background-color: #ff6b6b;
+    transform: translateX(-100%);
+}
+
+.timerRulerLabels {
+    color: #aaaaaa;
+    font-size: 0.62rem;
+    height: 14px;
+    position: relative;
+}
+
+.timerRulerLabel {
+    position: absolute;
+    top: 2px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.timerRulerLabel--start {
+    left: 0;
+    transform: translateX(0);
+}
+
+.timerRulerLabel--end {
+    right: 0;
+    transform: translateX(0);
+}
+
+.runProgressDetail {
+    color: #aaaaaa;
+    font-size: 0.68rem;
+    line-height: 1.1;
+    margin-top: 1px;
+    white-space: nowrap;
 }
