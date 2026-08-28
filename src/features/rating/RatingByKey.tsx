@@ -62,6 +62,8 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
 
     const [error, setError] = useState<Error | null>(null);
     const [dungeons, setDungeons] = useState<RaiderIODungeon[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [requestVersion, setRequestVersion] = useState(0);
     const { tableData, lowestKey, highestKey } = useMemo(() => {
         const data: {[index: number]: TableData} = {};
         let lowestKeyWithRating = Number.POSITIVE_INFINITY;
@@ -158,41 +160,60 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
                     return;
                 }
 
-                if (result.seasons.length === 0) {
-                    return;
-                }
-
                 const now: Date = new Date();
 
-                for (let i = 0; i < result.seasons.length; ++i)
-                {
-                    const startDate: Date = new Date(result.seasons[i].starts.us);
-                    const endDate: Date = new Date(result.seasons[i].ends.us ?? "2099-12-31T23:59:59Z");
+                const currentSeason = result.seasons.find((season) => {
+                    const startDate: Date = new Date(season.starts.us);
+                    const endDate: Date = new Date(season.ends.us ?? "2099-12-31T23:59:59Z");
 
-                    if (result.seasons[i].is_main_season === true && startDate < now && endDate > now)
-                    {
-                        setDungeons(result.seasons[i].dungeons);
-                        break;
-                    }
+                    return season.is_main_season && startDate < now && endDate > now;
+                });
+
+                if (currentSeason === undefined) {
+                    throw new Error("No current season data is available.");
                 }
+
+                setDungeons(currentSeason.dungeons);
+                setIsLoading(false);
             })
             .catch((error) => {
                 if (controller.signal.aborted) {
                     return;
                 }
 
+                setIsLoading(false);
                 setError(error);
             });
 
         return () => controller.abort();
-    }, [runData])
+    }, [runData, requestVersion])
+
+    const handleRetry = (): void => {
+        setIsLoading(true);
+        setError(null);
+        setDungeons(null);
+        setRequestVersion((currentVersion) => currentVersion + 1);
+    };
 
     if (runData == null) {
         return <div></div>
     }
 
     if (error) {
-        return <div>{error.message}</div>
+        return (
+            <section className="ratingStatus ratingStatus--error" role="alert">
+                <p>{error.message}</p>
+                <button className="retryButton" type="button" onClick={handleRetry}>Retry</button>
+            </section>
+        )
+    }
+
+    if (isLoading || dungeons === null) {
+        return (
+            <section className="ratingStatus" role="status" aria-live="polite">
+                Loading dungeon data...
+            </section>
+        )
     }
 
     return (

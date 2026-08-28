@@ -146,25 +146,30 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
     const [error, setError] = useState<Error | null>(null)
     const [characterDetails, setCharacterDetails] = useState<CharacterDetails | null>(null)
     const [loadedCharacter, setLoadedCharacter] = useState<CharacterInput | null>(null);
+    const [isLoading, setIsLoading] = useState(region !== "" && realm !== "" && character !== "");
+    const [requestVersion, setRequestVersion] = useState(0);
+
+    const beginCharacterLookup = (): void => {
+        setCharacterDetails(null);
+        setError(null);
+        setIsLoading(true);
+        onDataChange(null, null);
+        setRequestVersion((currentVersion) => currentVersion + 1);
+        navigate(`/${regionState}/${realmState}/${characterState}`);
+    };
 
     const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
         if (e.code !== "Enter" ) {
             return;
         }
 
-        setCharacterDetails(null);
-        onDataChange(null, null);
-
-        navigate(`/${regionState}/${realmState}/${characterState}`);
+        beginCharacterLookup();
     }
     
     const handleFetch = (e: MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
 
-        setCharacterDetails(null);
-        onDataChange(null, null);
-        
-        navigate(`/${regionState}/${realmState}/${characterState}`);
+        beginCharacterLookup();
     }
 
     const fetchCharacterData = useCallback((regionLocal: string, realmLocal: string | undefined, characterLocal: string | undefined, signal: AbortSignal) => {
@@ -186,6 +191,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                 }
 
                 if (isRaiderIOErrorResponse(result)) {
+                    setIsLoading(false);
                     setError(new Error(result.message ?? result.error ?? "An error occurred."));
                     setCharacterDetails(null);
                     onDataChange(null, null);
@@ -206,6 +212,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     rating: rating,
                     rating_color: rating_color,
                 });
+                setIsLoading(false);
                 setError(null);
                 onDataChange([...result.mythic_plus_best_runs], rating, result.mythic_plus_dungeon_run_counts ?? []);
                 setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
@@ -215,6 +222,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     return;
                 }
 
+                setIsLoading(false);
                 setError(error);
                 setCharacterDetails(null);
                 onDataChange(null, null);
@@ -232,12 +240,12 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
       fetchCharacterData(region, realm, character, controller.signal);
 
       return () => controller.abort();
-    }, [region, realm, character, fetchCharacterData]);
+    }, [region, realm, character, fetchCharacterData, requestVersion]);
 
     return (
         <div className="characterWorkspace">
           <div className="characterLookup">
-            <section className="selectorPanel" aria-labelledby="character-lookup-heading">
+            <section className="selectorPanel" aria-labelledby="character-lookup-heading" aria-busy={isLoading}>
                 <div className="panelHeading">
                     <div>
                         <span className="panelEyebrow">Character lookup</span>
@@ -264,10 +272,18 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     <input id="character-name" type="text" onChange={(e) => setCharacter(e.target.value)} onKeyDown={handleKeyPress} value={characterState} />
                 </div>
                 <div className="inputField inputField--submit">
-                    <button className="primaryButton" type="button" onClick={handleFetch}>Fetch Character</button>
+                    <button className="primaryButton" type="button" onClick={handleFetch} disabled={isLoading}>
+                        {isLoading ? "Loading..." : "Fetch Character"}
+                    </button>
                 </div>
                 </div>
-                {error !== null && <div className="error_message" role="alert">{error.message}</div>}
+                {isLoading && <p className="loading_message" role="status" aria-live="polite">Loading character data...</p>}
+                {error !== null && (
+                    <div className="error_message" role="alert">
+                        <span>{error.message}</span>
+                        <button className="retryButton" type="button" onClick={beginCharacterLookup}>Retry</button>
+                    </div>
+                )}
             </section>
             {characterDetails !== null && <CharacterBadge {...characterDetails} />}
           </div>

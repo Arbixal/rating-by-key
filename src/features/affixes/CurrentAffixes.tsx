@@ -38,10 +38,11 @@ function matchesTouchDevice(): boolean {
 function CurrentAffixes()
 {
     const [error, setError] = useState<Error | null>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [affixes, setAffixes] = useState<Affix[]>([]);
     const [isTouchDevice, setIsTouchDevice] = useState(matchesTouchDevice);
     const [expandedAffixId, setExpandedAffixId] = useState<number | null>(null);
+    const [requestVersion, setRequestVersion] = useState(0);
 
     useEffect(() => {
         if (typeof window.matchMedia !== "function") {
@@ -79,7 +80,7 @@ function CurrentAffixes()
                     return;
                 }
 
-                setIsLoaded(true);
+                setIsLoading(false);
                 setAffixes(result.affix_details);
             })
             .catch((error) => {
@@ -87,12 +88,19 @@ function CurrentAffixes()
                     return;
                 }
 
-                setIsLoaded(true);
+                setIsLoading(false);
                 setError(error);
             });
 
         return () => controller.abort();
-    }, [])
+    }, [requestVersion])
+
+    const handleRetry = (): void => {
+        setError(null);
+        setIsLoading(true);
+        setAffixes([]);
+        setRequestVersion((currentVersion) => currentVersion + 1);
+    };
 
     const handleAffixClick = (event: MouseEvent<HTMLAnchorElement>, affixId: number): void => {
         if (!isTouchDevice) {
@@ -105,16 +113,17 @@ function CurrentAffixes()
 
     if (error) {
         return (
-            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading">
+            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading" role="alert">
                 <h2 id="current-affixes-heading">Current Affixes:</h2>
                 <p>Error: {error.message}</p>
+                <button className="retryButton" type="button" onClick={handleRetry}>Retry</button>
             </section>
         )
-    } else if (!isLoaded) {
+    } else if (isLoading) {
         return (
-            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading">
+            <section className="affixBox affixBox--status" aria-labelledby="current-affixes-heading" role="status" aria-live="polite">
                 <h2 id="current-affixes-heading">Current Affixes:</h2>
-                <p>Loading ...</p>
+                <p>Loading current affixes...</p>
             </section>
         )
     } else {

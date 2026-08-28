@@ -84,6 +84,18 @@
     outline: none;
 }
 
+.primaryButton:disabled {
+    background-color: #45616d;
+    border-color: #557580;
+    cursor: wait;
+}
+
+.loading_message {
+    color: var(--muted-text);
+    font-size: 0.8rem;
+    margin: 12px 0 0;
+}
+
 .error_message {
     background-color: rgba(172, 31, 57, 0.16);
     border: 1px solid var(--danger);
@@ -91,6 +103,28 @@
     color: #ff9999;
     margin-top: 12px;
     padding: 9px 11px;
+}
+
+.error_message .retryButton {
+    align-self: flex-start;
+    margin-top: 10px;
+}
+
+.retryButton {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 7px 11px;
+}
+
+.retryButton:hover,
+.retryButton:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
 }
 
 @media (max-width: 900px) {

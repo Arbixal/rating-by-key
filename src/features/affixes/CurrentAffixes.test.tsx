@@ -88,4 +88,28 @@ describe('CurrentAffixes touch interactions', () => {
 
     expect(await screen.findByText(/The API returned data in an unexpected format\./)).toBeInTheDocument();
   });
+
+  test('retries after a request failure', async () => {
+    const matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    const fetchMock = vi.fn()
+      .mockRejectedValueOnce(new Error('Temporary failure'))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => affixesResponse,
+      });
+
+    vi.stubGlobal('matchMedia', matchMedia);
+    vi.stubGlobal('fetch', fetchMock);
+    render(<CurrentAffixes />);
+
+    expect(await screen.findByText(/Temporary failure/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
+
+    expect(await screen.findByRole('link', {name: /Fortified/})).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });

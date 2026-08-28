@@ -129,6 +129,40 @@ tr.even td.tyrannical {
     text-align: right !important;
 }
 
+.ratingStatus {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted-text);
+    padding: 16px;
+}
+
+.ratingStatus--error {
+    border-color: var(--danger);
+}
+
+.ratingStatus p {
+    margin: 0;
+}
+
+.ratingStatus .retryButton {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 12px;
+    padding: 7px 11px;
+}
+
+.ratingStatus .retryButton:hover,
+.ratingStatus .retryButton:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
+}
+
 .rating {
     width: 50px;
 }

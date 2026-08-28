@@ -14,6 +14,24 @@
     margin: 10px 0 0;
 }
 
+.retryButton {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 12px;
+    padding: 7px 11px;
+}
+
+.retryButton:hover,
+.retryButton:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
+}
+
 .affixBox h2 {
     font-size: 1rem;
     line-height: 1.2;
