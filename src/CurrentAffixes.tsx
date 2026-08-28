@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useState } from "react";
 import "./CurrentAffixes.css";
-import { fetchJson } from "./api";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
 
 export interface Affix {
     id: number;
@@ -11,10 +11,22 @@ export interface Affix {
 }
 
 interface AffixesResult {
-    region: string;
-    title: string;
-    leaderboard_url: string;
     affix_details: Affix[];
+}
+
+function isAffix(value: unknown): value is Affix {
+    return isRecord(value)
+        && isFiniteNumber(value.id)
+        && isString(value.name)
+        && isString(value.description)
+        && isString(value.icon)
+        && isString(value.wowhead_url);
+}
+
+function isAffixesResult(value: unknown): value is AffixesResult {
+    return isRecord(value)
+        && Array.isArray(value.affix_details)
+        && value.affix_details.every(isAffix);
 }
 
 function matchesTouchDevice(): boolean {
@@ -58,7 +70,10 @@ function CurrentAffixes()
     useEffect(() => {
         const controller = new AbortController();
 
-        fetchJson<AffixesResult>("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en", {signal: controller.signal})
+        fetchJson<AffixesResult>("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en", {
+            signal: controller.signal,
+            validate: isAffixesResult,
+        })
             .then((result: AffixesResult) => {
                 if (controller.signal.aborted) {
                     return;

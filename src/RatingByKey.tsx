@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
-import { fetchJson } from "./api";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
 import RatingByKeyRow from "./RatingByKeyRow";
 import { getDisplayedRatingRange, getScoreLevels, TableData } from "./ratingData";
 import type { DungeonRunCount, RaiderIODungeon } from "./ratingData";
@@ -11,15 +11,39 @@ interface RaiderIOStaticData {
 }
 
 interface RaiderIOSeason {
-    slug: string,
-    name: string,
-    blizzard_season_id: number,
     is_main_season: boolean,
-    short_name: string,
-    seasonal_affix: string | null,
-    starts: { us: string, eu: string, tw: string, kr: string, cn: string },
-    ends: { us: string | null, eu: string | null, tw: string | null, kr: string | null, cn: string | null },
+    starts: { us: string },
+    ends: { us: string | null },
     dungeons: RaiderIODungeon[],
+}
+
+function isRaiderIODungeon(value: unknown): value is RaiderIODungeon {
+    return isRecord(value)
+        && isFiniteNumber(value.id)
+        && isFiniteNumber(value.challenge_mode_id)
+        && isString(value.slug)
+        && isString(value.name)
+        && isString(value.short_name)
+        && isFiniteNumber(value.keystone_timer_seconds)
+        && isString(value.icon_url)
+        && isString(value.background_image_url);
+}
+
+function isRaiderIOSeason(value: unknown): value is RaiderIOSeason {
+    return isRecord(value)
+        && typeof value.is_main_season === "boolean"
+        && isRecord(value.starts)
+        && isString(value.starts.us)
+        && isRecord(value.ends)
+        && (value.ends.us === null || isString(value.ends.us))
+        && Array.isArray(value.dungeons)
+        && value.dungeons.every(isRaiderIODungeon);
+}
+
+function isRaiderIOStaticData(value: unknown): value is RaiderIOStaticData {
+    return isRecord(value)
+        && Array.isArray(value.seasons)
+        && value.seasons.every(isRaiderIOSeason);
 }
 
 interface RatingByKeyProps {
@@ -125,7 +149,10 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
 
         const controller = new AbortController();
 
-        fetchJson<RaiderIOStaticData>("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION, {signal: controller.signal})
+        fetchJson<RaiderIOStaticData>("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION, {
+            signal: controller.signal,
+            validate: isRaiderIOStaticData,
+        })
             .then((result: RaiderIOStaticData) => {
                 if (controller.signal.aborted) {
                     return;

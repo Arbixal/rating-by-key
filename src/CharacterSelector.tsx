@@ -1,56 +1,42 @@
 import { KeyboardEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
-import { Affix } from "./CurrentAffixes";
+import type { Affix } from "./CurrentAffixes";
 import RecentCharacters, { CharacterInput } from "./RecentCharacters";
 import type { DungeonRunCount } from "./ratingData";
-import { fetchJson } from "./api";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
 import { useNavigate } from "react-router";
 
-interface RaiderIOCharacter extends RaiderIOError {
+interface RaiderIOCharacter {
     name: string,
     class: string,
     thumbnail_url: string,
     profile_url: string,
     mythic_plus_scores_by_season: RaiderIOScoreBySeason[],
     mythic_plus_best_runs: RaiderIORun[],
-    mythic_plus_alternate_runs: RaiderIORun[],
+    mythic_plus_alternate_runs?: RaiderIORun[],
     mythic_plus_dungeon_run_counts?: DungeonRunCount[],
 }
 
+interface RaiderIOErrorResponse {
+    statusCode: number,
+    error?: string | null,
+    message?: string | null,
+}
+
+type RaiderIOCharacterResponse = RaiderIOCharacter | RaiderIOErrorResponse;
+
 interface RaiderIOScoreBySeason {
-    season: string,
     scores: { 
-        all: number, 
-        dps: number, 
-        healer: number, 
-        tank: number, 
-        spec_0: number, 
-        spec_1: number, 
-        spec_2: number, 
-        spec_3: number,
+        all: number,
     }
     segments: { 
         all: RaiderIOScoreSegment,
-        dps: RaiderIOScoreSegment, 
-        healer: RaiderIOScoreSegment, 
-        tank: RaiderIOScoreSegment, 
-        spec_0: RaiderIOScoreSegment, 
-        spec_1: RaiderIOScoreSegment, 
-        spec_2: RaiderIOScoreSegment, 
-        spec_3: RaiderIOScoreSegment,
     }
 }
 
 interface RaiderIOScoreSegment {
-    score: number,
     color: string,
-}
-
-interface RaiderIOError {
-    statusCode: number | null,
-    error: string | null,
-    message: string | null,
 }
 
 export interface RaiderIORun {
@@ -66,6 +52,82 @@ export interface RaiderIORun {
     url: string,
     affixes: Affix[],
     score: number,
+}
+
+function isRaiderIOScoreSegment(value: unknown): value is RaiderIOScoreSegment {
+    return isRecord(value)
+        && isString(value.color);
+}
+
+function isRaiderIOScoreBySeason(value: unknown): value is RaiderIOScoreBySeason {
+    if (!isRecord(value) || !isRecord(value.scores) || !isRecord(value.segments)) {
+        return false;
+    }
+
+    return isFiniteNumber(value.scores.all) && isRaiderIOScoreSegment(value.segments.all);
+}
+
+function isRaiderIOAffix(value: unknown): value is Affix {
+    return isRecord(value)
+        && isFiniteNumber(value.id)
+        && isString(value.name)
+        && isString(value.description)
+        && isString(value.icon)
+        && isString(value.wowhead_url);
+}
+
+function isRaiderIORun(value: unknown): value is RaiderIORun {
+    return isRecord(value)
+        && isString(value.dungeon)
+        && isString(value.short_name)
+        && isFiniteNumber(value.mythic_level)
+        && isString(value.completed_at)
+        && isFiniteNumber(value.clear_time_ms)
+        && isFiniteNumber(value.par_time_ms)
+        && isFiniteNumber(value.num_keystone_upgrades)
+        && isFiniteNumber(value.map_challenge_mode_id)
+        && isFiniteNumber(value.zone_id)
+        && isString(value.url)
+        && Array.isArray(value.affixes)
+        && value.affixes.every(isRaiderIOAffix)
+        && isFiniteNumber(value.score);
+}
+
+function isDungeonRunCount(value: unknown): value is DungeonRunCount {
+    return isRecord(value)
+        && isFiniteNumber(value.zone_id)
+        && isString(value.dungeon)
+        && isString(value.short_name)
+        && isFiniteNumber(value.season_runs_total)
+        && isFiniteNumber(value.season_runs_timed);
+}
+
+function isRaiderIOCharacter(value: unknown): value is RaiderIOCharacter {
+    return isRecord(value)
+        && isString(value.name)
+        && isString(value.class)
+        && isString(value.thumbnail_url)
+        && isString(value.profile_url)
+        && Array.isArray(value.mythic_plus_scores_by_season)
+        && value.mythic_plus_scores_by_season.every(isRaiderIOScoreBySeason)
+        && Array.isArray(value.mythic_plus_best_runs)
+        && value.mythic_plus_best_runs.every(isRaiderIORun)
+        && (value.mythic_plus_alternate_runs === undefined
+            || (Array.isArray(value.mythic_plus_alternate_runs) && value.mythic_plus_alternate_runs.every(isRaiderIORun)))
+        && (value.mythic_plus_dungeon_run_counts === undefined
+            || (Array.isArray(value.mythic_plus_dungeon_run_counts) && value.mythic_plus_dungeon_run_counts.every(isDungeonRunCount)));
+}
+
+function isRaiderIOErrorResponse(value: unknown): value is RaiderIOErrorResponse {
+    return isRecord(value)
+        && isFiniteNumber(value.statusCode)
+        && value.statusCode !== 200
+        && (value.error === undefined || value.error === null || isString(value.error))
+        && (value.message === undefined || value.message === null || isString(value.message));
+}
+
+function isRaiderIOCharacterResponse(value: unknown): value is RaiderIOCharacterResponse {
+    return isRaiderIOErrorResponse(value) || isRaiderIOCharacter(value);
 }
 
 interface CharacterSelectorProps {
@@ -111,17 +173,20 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
             return;
         }
 
-        fetchJson<RaiderIOCharacter>("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase()
+        fetchJson<RaiderIOCharacterResponse>("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase()
             + "&realm=" + realmLocal.toLowerCase() 
             + "&name=" + characterLocal.toLowerCase() 
-            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_dungeon_run_counts%3Acurrent", {signal})
-            .then((result: RaiderIOCharacter) => {
+            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_dungeon_run_counts%3Acurrent", {
+                signal,
+                validate: isRaiderIOCharacterResponse,
+            })
+            .then((result: RaiderIOCharacterResponse) => {
                 if (signal.aborted) {
                     return;
                 }
 
-                if (result.statusCode && result.statusCode !== 200) {
-                    setError(new Error(result?.message ?? "An error occurred."));
+                if (isRaiderIOErrorResponse(result)) {
+                    setError(new Error(result.message ?? result.error ?? "An error occurred."));
                     setCharacterDetails(null);
                     onDataChange(null, null);
                     return;

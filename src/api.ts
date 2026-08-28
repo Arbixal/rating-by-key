@@ -10,8 +10,21 @@ export class ApiError extends Error {
     }
 }
 
-interface FetchJsonOptions extends RequestInit {
+interface FetchJsonOptions<T> extends RequestInit {
     timeoutMs?: number;
+    validate?: (value: unknown) => value is T;
+}
+
+export function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isString(value: unknown): value is string {
+    return typeof value === "string";
+}
+
+export function isFiniteNumber(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value);
 }
 
 function getApiErrorMessage(payload: unknown): string | null {
@@ -31,8 +44,8 @@ function getApiErrorMessage(payload: unknown): string | null {
     return null;
 }
 
-export async function fetchJson<T>(input: RequestInfo | URL, options: FetchJsonOptions = {}): Promise<T> {
-    const {timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS, signal: callerSignal, ...requestInit} = options;
+export async function fetchJson<T>(input: RequestInfo | URL, options: FetchJsonOptions<T> = {}): Promise<T> {
+    const {timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS, signal: callerSignal, validate, ...requestInit} = options;
     const requestController = new AbortController();
     let didTimeout = false;
     const timeoutId = setTimeout(() => {
@@ -67,6 +80,10 @@ export async function fetchJson<T>(input: RequestInfo | URL, options: FetchJsonO
                 getApiErrorMessage(payload) ?? `The API request failed with status ${response.status}.`,
                 response.status,
             );
+        }
+
+        if (validate !== undefined && !validate(payload)) {
+            throw new ApiError("The API returned data in an unexpected format.", response.status);
         }
 
         return payload as T;

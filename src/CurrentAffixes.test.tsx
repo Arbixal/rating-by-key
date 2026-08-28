@@ -69,4 +69,23 @@ describe('CurrentAffixes touch interactions', () => {
     expect(affixLink).toHaveAttribute('href', 'https://wowhead.com/affix=10');
     expect(screen.queryByText('Non-boss enemies have more health.')).not.toBeInTheDocument();
   });
+
+  test('shows an error for a malformed API payload', async () => {
+    const matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({affix_details: [{name: 'Incomplete'}]}),
+    });
+
+    vi.stubGlobal('matchMedia', matchMedia);
+    vi.stubGlobal('fetch', fetchMock);
+    render(<CurrentAffixes />);
+
+    expect(await screen.findByText(/The API returned data in an unexpected format\./)).toBeInTheDocument();
+  });
 });

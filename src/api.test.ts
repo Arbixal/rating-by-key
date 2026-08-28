@@ -42,6 +42,26 @@ describe('fetchJson', () => {
     );
   });
 
+  test('rejects a successful response that fails its runtime validator', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({unexpected: true}),
+    }));
+
+    await expect(fetchJson<{ready: true}>('/api/example', {
+      validate: (value: unknown): value is {ready: true} => {
+        return typeof value === 'object' && value !== null && 'ready' in value && value.ready === true;
+      },
+    })).rejects.toEqual(
+      expect.objectContaining({
+        name: 'ApiError',
+        message: 'The API returned data in an unexpected format.',
+        status: 200,
+      }),
+    );
+  });
+
   test('aborts and reports a request timeout', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('fetch', vi.fn((_input: RequestInfo | URL, init?: RequestInit) => new Promise<Response>((_resolve, reject) => {
