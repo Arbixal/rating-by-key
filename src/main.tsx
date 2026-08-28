@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import ErrorBoundary from './ErrorBoundary';
+import './styles/globals.css';
+import App from './app/App';
+import ErrorBoundary from './shared/ui/ErrorBoundary';
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 

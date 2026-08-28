@@ -109,6 +109,23 @@ test('loads the root page', async ({ page }) => {
   expect(pageErrors).toEqual([]);
 });
 
+test('reveals affix details before following its external link on touch devices', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'This interaction is specific to the mobile project.');
+
+  await stubRaiderIo(page);
+  await page.goto('/');
+
+  const affixLink = page.getByRole('link', { name: /Fortified/ }).first();
+  await expect(affixLink).toBeVisible();
+  await affixLink.tap();
+
+  await expect(page).toHaveURL(/127\.0\.0\.1:4173\/$/);
+  await expect(affixLink).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByText('Non-boss enemies have more health.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'View on Wowhead' }))
+    .toHaveAttribute('href', 'https://wowhead.com/affix=10');
+});
+
 test('loads a character from a direct deep link and loads the rating chunk', async ({ page }) => {
   const pageErrors = collectPageErrors(page);
   await stubRaiderIo(page);

@@ -17,6 +17,10 @@ Start the Vite development server:
 npm run dev
 ```
 
+Application source is organized by feature under `src/features/`. Shared API,
+UI, and utility code lives under `src/shared/`, global styles live under
+`src/styles/`, and cross-feature integration tests live under `src/test/`.
+
 ## Checks
 
 Run the test suite once:

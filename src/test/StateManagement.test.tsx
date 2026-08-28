@@ -1,11 +1,11 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import CharacterSelector from './CharacterSelector';
-import type { RaiderIORun } from './CharacterSelector';
-import CurrentAffixes from './CurrentAffixes';
-import RatingByKey from './RatingByKey';
-import RecentCharacters, { CharacterInput } from './RecentCharacters';
+import CharacterSelector from '../features/characters/CharacterSelector';
+import type { RaiderIORun } from '../features/characters/CharacterSelector';
+import CurrentAffixes from '../features/affixes/CurrentAffixes';
+import RatingByKey from '../features/rating/RatingByKey';
+import RecentCharacters, { CharacterInput } from '../features/characters/RecentCharacters';
 
 afterEach(() => {
   cleanup();

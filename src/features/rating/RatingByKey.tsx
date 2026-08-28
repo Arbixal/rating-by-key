@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { RaiderIORun } from "./CharacterSelector";
+import { RaiderIORun } from "../characters/CharacterSelector";
 import "./RatingByKey.css";
-import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "../../shared/api/api";
 import RatingByKeyRow from "./RatingByKeyRow";
 import { getDisplayedRatingRange, getScoreLevels, TableData } from "./ratingData";
 import type { DungeonRunCount, RaiderIODungeon } from "./ratingData";

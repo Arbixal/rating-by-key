@@ -1,4 +1,4 @@
-import { formatTime } from "./utils";
+import { formatTime } from "../../shared/utils/utils";
 import type { TimerThresholds } from "./ratingData";
 
 interface TimerRulerProps {

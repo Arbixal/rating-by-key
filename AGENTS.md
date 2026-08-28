@@ -95,7 +95,7 @@ deployment workflow uploads that directory.
 ## Architecture Notes
 
 - `src/main.tsx` creates the browser router and renders the application.
-- `RatingByKey` is lazy-loaded from `src/App.tsx` because it contains the large
+- `RatingByKey` is lazy-loaded from `src/app/App.tsx` because it contains the large
   Recharts dependency. It is loaded after character data becomes available.
 - Route-driven Raider.IO requests are made from an effect in
   `CharacterSelector`; requests use `AbortController` so stale responses are
@@ -104,7 +104,7 @@ deployment workflow uploads that directory.
   State updates are immutable and persistence is handled in a separate effect.
 - Rating table data and key bounds are derived together from `runData` in a
   pure `useMemo` in `RatingByKey`.
-- Shared rating data types and calculations live in `src/ratingData.ts`.
+- Shared rating data types and calculations live in `src/features/rating/ratingData.ts`.
 - `public/` assets are served at the site root by Vite.
 - `index.html` includes an external WoWHead tooltip script. Preserve it unless
   its removal is intentional.

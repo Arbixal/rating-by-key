@@ -1,10 +1,10 @@
 import { KeyboardEvent, MouseEvent, useCallback, useEffect, useState } from "react";
 import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
-import type { Affix } from "./CurrentAffixes";
+import type { Affix } from "../affixes/CurrentAffixes";
 import RecentCharacters, { CharacterInput } from "./RecentCharacters";
-import type { DungeonRunCount } from "./ratingData";
-import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
+import type { DungeonRunCount } from "../rating/ratingData";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "../../shared/api/api";
 import { useNavigate } from "react-router";
 
 interface RaiderIOCharacter {

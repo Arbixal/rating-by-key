@@ -1,12 +1,12 @@
 import { lazy, Suspense, useCallback, useState } from 'react';
 import './App.css';
-import CharacterSelector, {RaiderIORun} from './CharacterSelector';
-import CurrentAffixes from './CurrentAffixes';
-import ErrorBoundary from './ErrorBoundary';
-import type { DungeonRunCount } from './ratingData';
+import CharacterSelector, {RaiderIORun} from '../features/characters/CharacterSelector';
+import CurrentAffixes from '../features/affixes/CurrentAffixes';
+import ErrorBoundary from '../shared/ui/ErrorBoundary';
+import type { DungeonRunCount } from '../features/rating/ratingData';
 import { useParams } from 'react-router';
 
-const RatingByKey = lazy(() => import('./RatingByKey'));
+const RatingByKey = lazy(() => import('../features/rating/RatingByKey'));
 
 function App() {
 

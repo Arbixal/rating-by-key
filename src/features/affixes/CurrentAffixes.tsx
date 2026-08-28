@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useState } from "react";
 import "./CurrentAffixes.css";
-import { fetchJson, isFiniteNumber, isRecord, isString } from "./api";
+import { fetchJson, isFiniteNumber, isRecord, isString } from "../../shared/api/api";
 
 export interface Affix {
     id: number;
