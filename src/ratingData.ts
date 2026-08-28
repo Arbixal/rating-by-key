@@ -53,16 +53,6 @@ export function getTimerThresholds(par: number): TimerThresholds {
 }
 
 function getScore(par: number, timer: number, level: number) {
-    /* Old way */
-    /*level = level + 10;
-    const bonus = Math.max(-1, Math.min(1, (par - timer) / (par * 0.4)));
-    const adjustedLevel = level + bonus + (bonus < 0 ? -1 : 0);
-    const levelsAbove10 = Math.max(0, level - 10);
-    const numberAffixes = (level < 15 ? 1 : (level > 19 ? 3 : 2));
-
-    return 20 + (adjustedLevel * 5) + (levelsAbove10 * 2) + (numberAffixes * 10);*/
-
-    /* New Way */
     const runTimePercentage = Math.min((par - timer) / par, 0.4);
     const multiplier = level + getNumberOfAffixes(level);
     const baseRating = 125 + (multiplier * 15);
