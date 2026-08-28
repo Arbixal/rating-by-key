@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import './App.css';
 import CharacterSelector, {RaiderIORun} from './CharacterSelector';
 import CurrentAffixes from './CurrentAffixes';
+import type { DungeonRunCount } from './ratingData';
 import { useParams } from 'react-router';
 
 const RatingByKey = lazy(() => import('./RatingByKey'));
@@ -11,10 +12,12 @@ function App() {
   const {region, realm, character} = useParams();
   const [runData, setRunData] = useState<RaiderIORun[] | null>(null);
   const [characterRating, setCharacterRating] = useState<number | null>(null);
+  const [runCounts, setRunCounts] = useState<DungeonRunCount[]>([]);
   
-  const onRunDataChange = useCallback((data: RaiderIORun[] | null, rating: number | null) => {
+  const onRunDataChange = useCallback((data: RaiderIORun[] | null, rating: number | null, counts: DungeonRunCount[] = []) => {
     setRunData(data);
     setCharacterRating(rating);
+    setRunCounts(counts);
   }, [setRunData, setCharacterRating]);
 
   return (
@@ -40,7 +43,7 @@ function App() {
         {runData !== null && characterRating !== null && (
           <section className="ratingSection" aria-label="Rating by key projections">
             <Suspense fallback={<div className="loadingPanel">Loading ratings...</div>}>
-              <RatingByKey runData={runData} characterRating={characterRating} />
+              <RatingByKey runData={runData} characterRating={characterRating} runCounts={runCounts} />
             </Suspense>
           </section>
         )}

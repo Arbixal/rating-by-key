@@ -99,6 +99,16 @@ tr.even td.tyrannical {
     text-align: right;
 }
 
+.ratingTable th.runCountsHeader {
+    min-width: 230px;
+}
+
+.ratingTable td.runCountsCell {
+    min-width: 230px;
+    padding: 7px 10px;
+    text-align: left;
+}
+
 .ratingTable .level,
 .ratingTable .score,
 .ratingTable .ratingKeyCell {

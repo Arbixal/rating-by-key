@@ -1,0 +1,41 @@
+.runCountsCellContent {
+    min-width: 210px;
+    text-align: left;
+}
+
+.runCountsCellContent--unavailable {
+    color: var(--muted-text);
+    font-size: 0.75rem;
+}
+
+.runCountsCellSummary {
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.runCountsCellValue {
+    font-variant-numeric: tabular-nums;
+}
+
+.runCountsCellBar {
+    background-color: var(--surface-highlight);
+    border-radius: 4px;
+    display: flex;
+    height: 12px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.runCountsCellBar--empty {
+    background-color: var(--border);
+}
+
+.runCountsCellBarTimed {
+    background-color: var(--success);
+}
+
+.runCountsCellBarOvertime {
+    background-color: var(--danger);
+}

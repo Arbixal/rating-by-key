@@ -1,15 +1,17 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getDisplayedRatingRange, getTimerThresholds, TableData } from "./ratingData";
-import type { RaiderIODungeon, RatingRange } from "./ratingData";
+import type { DungeonRunCount, RaiderIODungeon, RatingRange } from "./ratingData";
 import { faAnglesDown, faAnglesUp } from "@fortawesome/free-solid-svg-icons";
 import { useState, MouseEvent } from "react";
 import { Line, LineChart, Legend, ResponsiveContainer, YAxis, Tooltip, XAxis } from "recharts";
 import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
+import DungeonRunCountBar from "./DungeonRunCountBar";
 import TimerRuler from "./TimerRuler";
 
 interface RatingByKeyRowProps {
     dungeon: RaiderIODungeon,
     playerData: TableData,
+    runCount: DungeonRunCount | null,
     highestKey: number,
     lowestKey: number,
     index: number,
@@ -50,7 +52,7 @@ function RatingThresholdLadder({ratingRange, scaleMax}: RatingThresholdLadderPro
     );
 }
 
-function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: RatingByKeyRowProps) {
+function RatingByKeyRow({dungeon, playerData, runCount, highestKey, lowestKey, index}: RatingByKeyRowProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
 
     const parTimer = (dungeon.keystone_timer_seconds * 1000) + 999; //SEASON_3_TIMERS[dungeon.id];
@@ -85,6 +87,9 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
         <td className="runProgressCell">
             <TimerRuler clearTime={playerData.bestRun?.timer ?? null} thresholds={timerThresholds} />
         </td>
+        <td className="runCountsCell">
+            <DungeonRunCountBar runCount={runCount} />
+        </td>
 
         {levelData.map(((lData,lix) => (
                 <td className={"ratingKeyCell " + (lix % 2 === 0 ? 'evenCol' : 'oddCol')} key={lData.level}>
@@ -103,7 +108,7 @@ function RatingByKeyRow({dungeon, playerData, highestKey, lowestKey, index}: Rat
     {expanded && (
         <tr className={index % 2 === 0 ? 'event' : 'odd'}>
             <td colSpan={2}>&nbsp;</td>
-            <td colSpan={highestKey-lowestKey+3} height="300">
+            <td colSpan={highestKey-lowestKey+4} height="300">
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                         data={levelData}

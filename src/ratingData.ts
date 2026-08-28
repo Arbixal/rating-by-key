@@ -9,6 +9,14 @@ export interface RaiderIODungeon {
     background_image_url: string
 }
 
+export interface DungeonRunCount {
+    zone_id: number;
+    dungeon: string;
+    short_name: string;
+    season_runs_total: number;
+    season_runs_timed: number;
+}
+
 interface AffixSummary {
     level: number | null,
     timer: number | null,

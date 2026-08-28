@@ -26,6 +26,15 @@ const characterResponse = {
       segments: { all: { color: '#9eff83' } },
     },
   ],
+  mythic_plus_dungeon_run_counts: [
+    {
+      zone_id: 16865,
+      dungeon: 'Altar of Fangs',
+      short_name: 'AOF',
+      season_runs_total: 2,
+      season_runs_timed: 1,
+    },
+  ],
   mythic_plus_best_runs: [
     {
       dungeon: 'Altar of Fangs',
@@ -112,6 +121,7 @@ test('loads a character from a direct deep link and loads the rating chunk', asy
   expect(response?.status()).toBe(200);
   await expect(page.getByText('Bixwar', { exact: true })).toBeVisible();
   await expect(page.getByText('Altar of Fangs', { exact: true })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Altar of Fangs: 1 timed, 1 overtime/ })).toBeVisible();
   expect((await ratingChunk).status()).toBe(200);
   expect(pageErrors).toEqual([]);
 });

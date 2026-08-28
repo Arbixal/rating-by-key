@@ -325,6 +325,7 @@ import "./CharacterSelector.css";
 import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
 import { Affix } from "./CurrentAffixes";
 import RecentCharacters, { CharacterInput } from "./RecentCharacters";
+import type { DungeonRunCount } from "./ratingData";
 import { useNavigate } from "react-router";
 
 interface RaiderIOCharacter extends RaiderIOError {
@@ -335,6 +336,7 @@ interface RaiderIOCharacter extends RaiderIOError {
     mythic_plus_scores_by_season: RaiderIOScoreBySeason[],
     mythic_plus_best_runs: RaiderIORun[],
     mythic_plus_alternate_runs: RaiderIORun[],
+    mythic_plus_dungeon_run_counts?: DungeonRunCount[],
 }
 
 interface RaiderIOScoreBySeason {
@@ -388,7 +390,7 @@ export interface RaiderIORun {
 }
 
 interface CharacterSelectorProps {
-    onDataChange: (data: RaiderIORun[] | null, rating: number | null) => void;
+    onDataChange: (data: RaiderIORun[] | null, rating: number | null, runCounts?: DungeonRunCount[]) => void;
     region: string;
     realm: string;
     character: string;
@@ -433,7 +435,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
         fetch("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase() 
             + "&realm=" + realmLocal.toLowerCase() 
             + "&name=" + characterLocal.toLowerCase() 
-            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs", {signal})
+            + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_dungeon_run_counts%3Acurrent", {signal})
             .then(resp => resp.json())
             .then((result: RaiderIOCharacter) => {
                 if (signal.aborted) {
@@ -462,7 +464,7 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
                     rating_color: rating_color,
                 });
                 setError(null);
-                onDataChange([...result.mythic_plus_best_runs], rating);
+                onDataChange([...result.mythic_plus_best_runs], rating, result.mythic_plus_dungeon_run_counts ?? []);
                 setLoadedCharacter({region: regionLocal.toLowerCase(), realm: realmLocal.toLowerCase(), name: characterLocal.toLowerCase(), lastAccessed: (new Date()).getTime() / 1000, playerClass: result.class.toLowerCase().replace(" ", "_")});
             })
             .catch(error => {

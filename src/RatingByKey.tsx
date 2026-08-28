@@ -3,7 +3,7 @@ import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
 import RatingByKeyRow from "./RatingByKeyRow";
 import { getDisplayedRatingRange, getScoreLevels, TableData } from "./ratingData";
-import type { RaiderIODungeon } from "./ratingData";
+import type { DungeonRunCount, RaiderIODungeon } from "./ratingData";
 
 // https://raider.io/api/v1/mythic-plus/static-data?expansion_id=9
 /*
@@ -110,6 +110,7 @@ interface RaiderIOSeason {
 interface RatingByKeyProps {
     runData: RaiderIORun[] | null,
     characterRating: number,
+    runCounts?: DungeonRunCount[],
 }
 
 const CURRENT_EXPANSION = 11;
@@ -118,7 +119,7 @@ const DEFAULT_HIGHEST_KEY = 12;
 const MIN_DISPLAYED_KEY_COLUMNS = 5;
 const MAX_DISPLAYED_KEY_COLUMNS = 11;
 
-function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
+function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyProps) {
 
     const [error, setError] = useState<Error | null>(null);
     const [dungeons, setDungeons] = useState<RaiderIODungeon[] | null>(null);
@@ -259,6 +260,7 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
                 <tr>
                     <th className="dungeonHeader" rowSpan={2}>Dungeon</th>
                     <th className="bestRunHeader" colSpan={3}>Best Run</th>
+                    <th className="runCountsHeader" rowSpan={2}>Season Runs</th>
                     <th className="ratingGroupHeader" colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
@@ -283,6 +285,7 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
                         index={ix} 
                         dungeon={dungeon} 
                         playerData={tableData[dungeon.id] ?? new TableData()}
+                        runCount={runCounts.find((runCount) => runCount.zone_id === dungeon.id) ?? null}
                         highestKey={highestKey}
                         lowestKey={lowestKey}
                     />
@@ -290,7 +293,7 @@ function RatingByKey ({runData, characterRating}: RatingByKeyProps) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td className="projectedTotalCell" colSpan={4}>Projected Total</td>
+                    <td className="projectedTotalCell" colSpan={5}>Projected Total</td>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
                         const total = columnTotals?.[ix];
 

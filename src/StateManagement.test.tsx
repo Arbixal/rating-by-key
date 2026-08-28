@@ -54,7 +54,7 @@ describe('route-driven character loading', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toContain('region=us');
     expect(fetchMock.mock.calls[0][1]).toEqual({ signal: expect.any(AbortSignal) });
-    expect(onDataChange).toHaveBeenCalledWith([], 837);
+    expect(onDataChange).toHaveBeenCalledWith([], 837, []);
   });
 });
 
