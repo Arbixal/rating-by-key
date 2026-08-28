@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import './App.css';
 import CharacterSelector, {RaiderIORun} from './CharacterSelector';
 import CurrentAffixes from './CurrentAffixes';
+import ErrorBoundary from './ErrorBoundary';
 import type { DungeonRunCount } from './ratingData';
 import { useParams } from 'react-router';
 
@@ -42,9 +43,15 @@ function App() {
         />
         {runData !== null && characterRating !== null && (
           <section className="ratingSection" aria-label="Rating by key projections">
-            <Suspense fallback={<div className="loadingPanel">Loading ratings...</div>}>
-              <RatingByKey runData={runData} characterRating={characterRating} runCounts={runCounts} />
-            </Suspense>
+            <ErrorBoundary
+              key={`${region ?? 'us'}/${realm ?? ''}/${character ?? ''}`}
+              title="Rating analysis unavailable"
+              message="The character loaded, but the rating analysis could not be displayed."
+            >
+              <Suspense fallback={<div className="loadingPanel">Loading ratings...</div>}>
+                <RatingByKey runData={runData} characterRating={characterRating} runCounts={runCounts} />
+              </Suspense>
+            </ErrorBoundary>
           </section>
         )}
       </main>

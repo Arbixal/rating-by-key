@@ -1,0 +1,36 @@
+.errorBoundary {
+    background-color: var(--surface);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    margin: 16px auto;
+    max-width: 560px;
+    padding: 20px;
+}
+
+.errorBoundary h1 {
+    font-size: 1.2rem;
+    line-height: 1.2;
+    margin: 5px 0 0;
+}
+
+.errorBoundary p {
+    color: var(--muted-text);
+    line-height: 1.5;
+    margin: 10px 0 16px;
+}
+
+.errorBoundary button {
+    background-color: var(--accent);
+    border: 1px solid #2aa9dc;
+    border-radius: 5px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    padding: 8px 12px;
+}
+
+.errorBoundary button:hover,
+.errorBoundary button:focus-visible {
+    background-color: #2aa9dc;
+    outline: none;
+}
