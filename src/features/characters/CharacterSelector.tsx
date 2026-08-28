@@ -173,7 +173,6 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
     }
 
     const fetchCharacterData = useCallback((regionLocal: string, realmLocal: string | undefined, characterLocal: string | undefined, signal: AbortSignal) => {
-        console.log(`Loading ${regionLocal}/${realmLocal}/${characterLocal}`)
         if (!characterLocal || !regionLocal || !realmLocal) {
             return;
         }
@@ -236,7 +235,6 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
 
       const controller = new AbortController();
 
-      console.log(`Region: ${region}, Realm: ${realm}, Character: ${character}`);
       fetchCharacterData(region, realm, character, controller.signal);
 
       return () => controller.abort();
