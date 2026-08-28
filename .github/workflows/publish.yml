@@ -17,7 +17,7 @@ jobs:
         # React Router 8 requires Node >=22.22.0; use the current Active LTS line.
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
