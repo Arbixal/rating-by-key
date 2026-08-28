@@ -31,6 +31,12 @@ Run the linter:
 npm run lint
 ```
 
+Run the TypeScript check:
+
+```sh
+npm run typecheck
+```
+
 Run the browser tests after building the application:
 
 ```sh
