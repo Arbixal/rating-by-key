@@ -5,6 +5,12 @@ name: Node.js CI
 on:
   push:
     branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -44,6 +50,7 @@ jobs:
         path: build
 
   deploy_aws:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: build
     steps:

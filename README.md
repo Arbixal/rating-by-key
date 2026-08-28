@@ -59,5 +59,6 @@ locally with:
 npm run preview
 ```
 
-The `master` branch is built and deployed to AWS S3 and CloudFront through
-GitHub Actions.
+Pull requests targeting `master` run the validation workflow without
+deploying. Pushes to `master` are built and deployed to AWS S3 and CloudFront
+through GitHub Actions.
