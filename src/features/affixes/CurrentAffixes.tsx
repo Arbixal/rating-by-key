@@ -146,7 +146,7 @@ function CurrentAffixes()
                             aria-controls={isTouchDevice ? `affix-details-${affix.id}` : undefined}
                             aria-expanded={isTouchDevice ? expandedAffixId === affix.id : undefined}
                         >
-                            <img className="affixIcon" width="40" height="40" src={"https://assets.rpglogs.com/img/warcraft/abilities/" + affix.icon + ".jpg"} alt={affix.name}/>
+                            <img className="affixIcon" width="40" height="40" src={"https://assets.rpglogs.com/img/warcraft/abilities/" + affix.icon + ".jpg"} alt="" aria-hidden="true"/>
                             <span className="affixName">{affix.name}</span>
                         </a>
                         {isTouchDevice && expandedAffixId === affix.id && (

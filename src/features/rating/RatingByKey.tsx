@@ -218,26 +218,27 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
 
     return (
         <table className="ratingTable">
+            <caption className="ratingTableCaption">Rating gained by running each dungeon at different key levels</caption>
             <thead>
                 <tr>
-                    <th className="dungeonHeader" rowSpan={2}>Dungeon</th>
-                    <th className="bestRunHeader" colSpan={3}>Best Run</th>
-                    <th className="runCountsHeader" rowSpan={2}>Season Runs</th>
-                    <th className="ratingGroupHeader" colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
+                    <th className="dungeonHeader" scope="col" rowSpan={2}>Dungeon</th>
+                    <th className="bestRunHeader" scope="colgroup" colSpan={3}>Best Run</th>
+                    <th className="runCountsHeader" scope="col" rowSpan={2}>Season Runs</th>
+                    <th className="ratingGroupHeader" scope="colgroup" colSpan={highestKey-lowestKey+1}>Rating gained by running</th>
                 </tr>
                 <tr>
                     {/* Best Run */}
-                    <th className="level">Level</th>
-                    <th className="score">Score</th>
-                    <th className="runProgressHeader">Progress</th>
+                    <th className="level" scope="col">Level</th>
+                    <th className="score" scope="col">Score</th>
+                    <th className="runProgressHeader" scope="col">Progress</th>
 
                     {/* Keys */}
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
-                        return (<th key={(lowestKey+ix).toString() + "_header"} className={"key_rating ratingKeyHeader " + (ix % 2 === 0 ? 'evenCol' : 'oddCol')}>+{(lowestKey+ix).toString()}</th>)
+                        return (<th key={(lowestKey+ix).toString() + "_header"} scope="col" className={"key_rating ratingKeyHeader " + (ix % 2 === 0 ? 'evenCol' : 'oddCol')}>+{(lowestKey+ix).toString()}</th>)
                     })}
 
                     {/* Expanda */
-                    <th className="expandHeader"></th>}
+                    <th className="expandHeader" scope="col" aria-label="Rating chart controls"></th>}
                 </tr>
             </thead>
             <tbody>
@@ -255,7 +256,7 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
             </tbody>
             <tfoot>
                 <tr>
-                    <td className="projectedTotalCell" colSpan={5}>Projected Total</td>
+                    <th className="projectedTotalCell" scope="row" colSpan={5}>Projected Total</th>
                     {[...Array(highestKey-lowestKey+1)].map((_, ix) => {
                         const total = columnTotals?.[ix];
 

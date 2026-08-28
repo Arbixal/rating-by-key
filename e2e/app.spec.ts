@@ -105,7 +105,7 @@ test('loads the root page', async ({ page }) => {
   expect(response?.status()).toBe(200);
   await expect(page.getByText('Rating by Key', { exact: true })).toBeVisible();
   await expect(page.getByText('Current Affixes:', { exact: true })).toBeVisible();
-  await expect(page.getByAltText('Fortified')).toHaveAttribute('alt', 'Fortified');
+  await expect(page.locator('.affixIcon')).toHaveCount(1);
   expect(pageErrors).toEqual([]);
 });
 

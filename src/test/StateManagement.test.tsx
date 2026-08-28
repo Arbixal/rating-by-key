@@ -168,7 +168,7 @@ describe('rating data derivation', () => {
     expect(bestRunHeaders).toEqual(['Level', 'Score', 'Progress']);
     expect(screen.queryByRole('columnheader', { name: 'Timers' })).not.toBeInTheDocument();
 
-    const footerCells = Array.from(screen.getByRole('table').querySelectorAll('tfoot td'));
+    const footerCells = Array.from(screen.getByRole('table').querySelectorAll('tfoot th, tfoot td'));
 
     expect(footerCells).toHaveLength(7);
     expect(footerCells[0]).toHaveTextContent('Projected Total');
@@ -179,6 +179,9 @@ describe('rating data derivation', () => {
       '1233',
       '1263',
     ]);
+    expect(screen.getByRole('columnheader', {name: 'Season Runs'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Expand rating chart for Altar of Fangs'}))
+      .toHaveAttribute('aria-expanded', 'false');
   });
 
   test('shows the full display window when lower levels have no remaining rating', async () => {

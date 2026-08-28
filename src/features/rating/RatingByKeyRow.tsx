@@ -64,6 +64,8 @@ function RatingByKeyRow({dungeon, playerData, runCount, highestKey, lowestKey, i
         setExpanded(!expanded);
     }
 
+    const chartId = `rating-chart-${dungeon.id}`;
+
     const tooltipFormatter: Formatter = (value, name) => {
         const label = name ?? "";
         const numericValue = Number(value);
@@ -103,10 +105,20 @@ function RatingByKeyRow({dungeon, playerData, runCount, highestKey, lowestKey, i
             )
         ))}
 
-        <td><button onClick={handleExpandClick}><FontAwesomeIcon icon={expanded ? faAnglesUp : faAnglesDown}/></button></td>
+        <td className="expandCell">
+            <button
+                type="button"
+                onClick={handleExpandClick}
+                aria-controls={chartId}
+                aria-expanded={expanded}
+                aria-label={`${expanded ? "Collapse" : "Expand"} rating chart for ${dungeon.name}`}
+            >
+                <FontAwesomeIcon icon={expanded ? faAnglesUp : faAnglesDown}/>
+            </button>
+        </td>
     </tr>
     {expanded && (
-        <tr className={index % 2 === 0 ? 'event' : 'odd'}>
+        <tr className={index % 2 === 0 ? 'event' : 'odd'} id={chartId}>
             <td colSpan={2}>&nbsp;</td>
             <td colSpan={highestKey-lowestKey+4} height="300">
                 <ResponsiveContainer width="100%" height="100%">

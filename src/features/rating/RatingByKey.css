@@ -5,6 +5,14 @@
     margin-left: 5px;
 }
 
+.ratingTableCaption {
+    caption-side: top;
+    color: #aaaaaa;
+    font-size: 0.78rem;
+    padding: 0 0 8px;
+    text-align: left;
+}
+
 .ratingTable th,
 .ratingTable td {
     border-bottom: solid 1px #444444;
