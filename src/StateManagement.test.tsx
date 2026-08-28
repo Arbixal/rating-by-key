@@ -33,6 +33,7 @@ describe('route-driven character loading', () => {
       mythic_plus_best_runs: [],
     };
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => characterResponse,
     });
     const onDataChange = vi.fn();
@@ -108,6 +109,7 @@ describe('rating data derivation', () => {
       ],
     };
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => staticData,
     });
 
@@ -178,6 +180,7 @@ describe('rating data derivation', () => {
       ],
     };
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => staticData,
     });
 
@@ -231,6 +234,7 @@ describe('rating data derivation', () => {
       ],
     };
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => staticData,
     });
 

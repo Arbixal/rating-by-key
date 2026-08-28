@@ -32,6 +32,7 @@
 
 import { MouseEvent, useEffect, useState } from "react";
 import "./CurrentAffixes.css";
+import { fetchJson } from "./api";
 
 export interface Affix {
     id: number;
@@ -89,8 +90,7 @@ function CurrentAffixes()
     useEffect(() => {
         const controller = new AbortController();
 
-        fetch("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en", {signal: controller.signal})
-            .then(res => res.json())
+        fetchJson<AffixesResult>("https://raider.io/api/v1/mythic-plus/affixes?region=us&locale=en", {signal: controller.signal})
             .then((result: AffixesResult) => {
                 if (controller.signal.aborted) {
                     return;

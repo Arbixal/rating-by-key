@@ -31,6 +31,7 @@ describe('CurrentAffixes touch interactions', () => {
       removeEventListener: vi.fn(),
     });
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => affixesResponse,
     });
 
@@ -55,6 +56,7 @@ describe('CurrentAffixes touch interactions', () => {
       removeEventListener: vi.fn(),
     });
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => affixesResponse,
     });
 

@@ -326,6 +326,7 @@ import CharacterBadge, {CharacterDetails} from "./CharacterBadge";
 import { Affix } from "./CurrentAffixes";
 import RecentCharacters, { CharacterInput } from "./RecentCharacters";
 import type { DungeonRunCount } from "./ratingData";
+import { fetchJson } from "./api";
 import { useNavigate } from "react-router";
 
 interface RaiderIOCharacter extends RaiderIOError {
@@ -432,11 +433,10 @@ function CharacterSelector({onDataChange, region, realm, character}: CharacterSe
             return;
         }
 
-        fetch("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase() 
+        fetchJson<RaiderIOCharacter>("https://raider.io/api/v1/characters/profile?region=" + regionLocal.toLowerCase()
             + "&realm=" + realmLocal.toLowerCase() 
             + "&name=" + characterLocal.toLowerCase() 
             + "&fields=mythic_plus_scores_by_season%3Acurrent%2Cmythic_plus_best_runs%2Cmythic_plus_dungeon_run_counts%3Acurrent", {signal})
-            .then(resp => resp.json())
             .then((result: RaiderIOCharacter) => {
                 if (signal.aborted) {
                     return;

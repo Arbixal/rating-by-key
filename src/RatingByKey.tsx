@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { RaiderIORun } from "./CharacterSelector";
 import "./RatingByKey.css";
+import { fetchJson } from "./api";
 import RatingByKeyRow from "./RatingByKeyRow";
 import { getDisplayedRatingRange, getScoreLevels, TableData } from "./ratingData";
 import type { DungeonRunCount, RaiderIODungeon } from "./ratingData";
@@ -210,8 +211,7 @@ function RatingByKey ({runData, characterRating, runCounts = []}: RatingByKeyPro
 
         const controller = new AbortController();
 
-        fetch("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION, {signal: controller.signal})
-            .then(res => res.json())
+        fetchJson<RaiderIOStaticData>("https://raider.io/api/v1/mythic-plus/static-data?expansion_id=" + CURRENT_EXPANSION, {signal: controller.signal})
             .then((result: RaiderIOStaticData) => {
                 if (controller.signal.aborted) {
                     return;
